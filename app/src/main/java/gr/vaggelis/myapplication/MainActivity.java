@@ -248,7 +248,7 @@ public class MainActivity extends PermissionsManager implements GPSListener, Sen
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         if (buttonView.getId() == R.id.openGpsSwitch) {
-            if (on_off_switch.isChecked()) {
+            if (isChecked) {
                 if (selectRoadSpinner.getSelectedItem().id != -1)
                     if (meters_seconds_switch.isChecked()) {
                         if (!selectMeters.getText().toString().equals("")) {
@@ -277,7 +277,7 @@ public class MainActivity extends PermissionsManager implements GPSListener, Sen
                 selectRoadSpinner.setSelectedItem(-1);
             }
         } else if (buttonView.getId() == R.id.meters_seconds_switch) {
-            if (!meters_seconds_switch.isChecked()) {
+            if (!isChecked) {
                 selectMeters.setVisibility(View.GONE);
                 selectSeconds.setVisibility(View.VISIBLE);
                 selectMeters.setText("");
@@ -306,7 +306,6 @@ public class MainActivity extends PermissionsManager implements GPSListener, Sen
                         Toast.makeText(MainActivity.this, "Οι εγγραφές διεγράφησαν", Toast.LENGTH_LONG).show();
                         break;
                     case DialogInterface.BUTTON_NEGATIVE:
-                        //No button clicked
                         break;
                 }
             } else {
