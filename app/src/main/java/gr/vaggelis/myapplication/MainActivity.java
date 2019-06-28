@@ -1,6 +1,8 @@
 package gr.vaggelis.myapplication;
 
 import android.Manifest;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.location.Location;
@@ -57,7 +59,7 @@ public class MainActivity extends PermissionsManager implements GPSListener, Sen
             Manifest.permission.WAKE_LOCK};
     GpsRecord gpsRecord;
     Switch on_off_switch, meters_seconds_switch;
-    EditText selectMilliSeconds, selectMeters;
+    EditText selectSeconds, selectMeters;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,15 +98,16 @@ public class MainActivity extends PermissionsManager implements GPSListener, Sen
         on_off_switch = findViewById(R.id.openGpsSwitch);
         meters_seconds_switch = findViewById(R.id.meters_seconds_switch);
         meters_seconds_switch.setOnCheckedChangeListener(this);
-        selectMilliSeconds = findViewById(R.id.secondsEditText);
+        selectSeconds = findViewById(R.id.secondsEditText);
         selectMeters = findViewById(R.id.metersEditText);
         on_off_switch.setOnCheckedChangeListener(this);
         selectRoadSpinner.setItems(getSpinnerItems());
+        selectMeters.setVisibility(View.GONE);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 
-    private void startGps(int seconds, int meters) {
-        myGpsManager = GPSManager.getInstance(this, seconds, meters);
+    private void startGps(int milliSeconds, int meters) {
+        myGpsManager = GPSManager.getInstance(this, milliSeconds, meters);
         myGpsManager.setGPSListener(this);
     }
 
@@ -256,8 +259,8 @@ public class MainActivity extends PermissionsManager implements GPSListener, Sen
                             on_off_switch.setChecked(false);
                         }
                     } else {
-                        if (!selectMilliSeconds.getText().toString().equals("")){
-                            startGps(Integer.valueOf(selectMilliSeconds.getText().toString()), 0);
+                        if (!selectSeconds.getText().toString().equals("")){
+                            startGps(Integer.valueOf(selectSeconds.getText().toString()) * 1000, 0);
                         }
                         else {
                             Toast.makeText(this, "Παρακαλώ συμπληρώστε πρώτα τα δευτερόλεπτα", Toast.LENGTH_LONG).show();
@@ -275,6 +278,16 @@ public class MainActivity extends PermissionsManager implements GPSListener, Sen
                 speed.setText("0.0");
                 selectRoadSpinner.setSelectedItem(-1);
             }
+        }else if(buttonView.getId() == R.id.meters_seconds_switch) {
+            if (!meters_seconds_switch.isChecked()) {
+                selectMeters.setVisibility(View.GONE);
+                selectSeconds.setVisibility(View.VISIBLE);
+                selectMeters.setText("");
+            } else {
+                selectSeconds.setVisibility(View.GONE);
+                selectMeters.setVisibility(View.VISIBLE);
+                selectSeconds.setText("");
+            }
         }
     }
 
@@ -287,11 +300,25 @@ public class MainActivity extends PermissionsManager implements GPSListener, Sen
     }
 
     public void deleteRecords(View view) {
-        if (selectRoadSpinner.getSelectedItem().id != -1) {
-            DatabaseInitializer.deleteGpsRecords(AppDatabase.getAppDatabase(this), selectRoadSpinner.getSelectedItem().id);
-            Toast.makeText(this, "Οι εγγραφές διεγράφησαν", Toast.LENGTH_LONG).show();
-        } else {
-            Toast.makeText(this, "Παρακαλώ επιλέξτε πρώτα την κατεύθυνση", Toast.LENGTH_LONG).show();
-        }
+        DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
+            switch (which){
+                case DialogInterface.BUTTON_POSITIVE:
+                    if (selectRoadSpinner.getSelectedItem().id != -1) {
+                        DatabaseInitializer.deleteGpsRecords(AppDatabase.getAppDatabase(MainActivity.this), selectRoadSpinner.getSelectedItem().id);
+                        Toast.makeText(MainActivity.this, "Οι εγγραφές διεγράφησαν", Toast.LENGTH_LONG).show();
+                    } else {
+                        Toast.makeText(MainActivity.this, "Παρακαλώ επιλέξτε πρώτα την κατεύθυνση", Toast.LENGTH_LONG).show();
+                    }
+                    break;
+                case DialogInterface.BUTTON_NEGATIVE:
+                    //No button clicked
+                    break;
+            }
+        };
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Είσαι σίγουρος ότι θέλεις να διαγραφούν οι εγγραφές που αφορούν " +"'"+ selectRoadSpinner.getSelectedItem().data +"'").setPositiveButton("Yes", dialogClickListener)
+                .setNegativeButton("No", dialogClickListener).show();
+
     }
 }
