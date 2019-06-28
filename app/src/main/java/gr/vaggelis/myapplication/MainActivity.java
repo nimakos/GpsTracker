@@ -251,18 +251,16 @@ public class MainActivity extends PermissionsManager implements GPSListener, Sen
             if (on_off_switch.isChecked()) {
                 if (selectRoadSpinner.getSelectedItem().id != -1)
                     if (meters_seconds_switch.isChecked()) {
-                        if (!selectMeters.getText().toString().equals("")){
+                        if (!selectMeters.getText().toString().equals("")) {
                             startGps(0, Integer.valueOf(selectMeters.getText().toString()));
-                        }
-                        else {
+                        } else {
                             Toast.makeText(this, "Παρακαλώ συμπληρώστε πρώτα τα μέτρα", Toast.LENGTH_LONG).show();
                             on_off_switch.setChecked(false);
                         }
                     } else {
-                        if (!selectSeconds.getText().toString().equals("")){
+                        if (!selectSeconds.getText().toString().equals("")) {
                             startGps(Integer.valueOf(selectSeconds.getText().toString()) * 1000, 0);
-                        }
-                        else {
+                        } else {
                             Toast.makeText(this, "Παρακαλώ συμπληρώστε πρώτα τα δευτερόλεπτα", Toast.LENGTH_LONG).show();
                             on_off_switch.setChecked(false);
                         }
@@ -278,7 +276,7 @@ public class MainActivity extends PermissionsManager implements GPSListener, Sen
                 speed.setText("0.0");
                 selectRoadSpinner.setSelectedItem(-1);
             }
-        }else if(buttonView.getId() == R.id.meters_seconds_switch) {
+        } else if (buttonView.getId() == R.id.meters_seconds_switch) {
             if (!meters_seconds_switch.isChecked()) {
                 selectMeters.setVisibility(View.GONE);
                 selectSeconds.setVisibility(View.VISIBLE);
@@ -301,7 +299,7 @@ public class MainActivity extends PermissionsManager implements GPSListener, Sen
 
     public void deleteRecords(View view) {
         DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
-            switch (which){
+            switch (which) {
                 case DialogInterface.BUTTON_POSITIVE:
                     if (selectRoadSpinner.getSelectedItem().id != -1) {
                         DatabaseInitializer.deleteGpsRecords(AppDatabase.getAppDatabase(MainActivity.this), selectRoadSpinner.getSelectedItem().id);
@@ -317,7 +315,7 @@ public class MainActivity extends PermissionsManager implements GPSListener, Sen
         };
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("Είσαι σίγουρος ότι θέλεις να διαγραφούν οι εγγραφές που αφορούν " +"'"+ selectRoadSpinner.getSelectedItem().data +"'").setPositiveButton("Yes", dialogClickListener)
+        builder.setMessage("Είσαι σίγουρος ότι θέλεις να διαγραφούν οι εγγραφές που αφορούν " + "'" + selectRoadSpinner.getSelectedItem().data + "'").setPositiveButton("Yes", dialogClickListener)
                 .setNegativeButton("No", dialogClickListener).show();
 
     }
