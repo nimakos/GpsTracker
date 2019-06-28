@@ -299,18 +299,18 @@ public class MainActivity extends PermissionsManager implements GPSListener, Sen
 
     public void deleteRecords(View view) {
         DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
-            switch (which) {
-                case DialogInterface.BUTTON_POSITIVE:
-                    if (selectRoadSpinner.getSelectedItem().id != -1) {
+            if (selectRoadSpinner.getSelectedItem().id != -1) {
+                switch (which) {
+                    case DialogInterface.BUTTON_POSITIVE:
                         DatabaseInitializer.deleteGpsRecords(AppDatabase.getAppDatabase(MainActivity.this), selectRoadSpinner.getSelectedItem().id);
                         Toast.makeText(MainActivity.this, "Οι εγγραφές διεγράφησαν", Toast.LENGTH_LONG).show();
-                    } else {
-                        Toast.makeText(MainActivity.this, "Παρακαλώ επιλέξτε πρώτα την κατεύθυνση", Toast.LENGTH_LONG).show();
-                    }
-                    break;
-                case DialogInterface.BUTTON_NEGATIVE:
-                    //No button clicked
-                    break;
+                        break;
+                    case DialogInterface.BUTTON_NEGATIVE:
+                        //No button clicked
+                        break;
+                }
+            } else {
+                Toast.makeText(MainActivity.this, "Παρακαλώ επιλέξτε πρώτα την κατεύθυνση", Toast.LENGTH_LONG).show();
             }
         };
 

@@ -11,33 +11,39 @@
       <quote-values-containing-separator value="false" />
       <quote-all-values value="false" />
       <value-separator value="," />
-      <file-name value="gpsRecord.csv" />
+      <file-name value="gpsRecordChalkida.csv" />
       <file-location value="C:\Users\vnikolis\Desktop" />
       <scope value="GLOBAL" />
       <destination value="FILE" />
       <format value="CSV" />
-      <charset value="windows-1253" />
+      <charset value="UTF-8" />
     </export-instructions>
   </component>
   <component name="DBNavigator.Project.DatabaseBrowserManager">
     <autoscroll-to-editor value="false" />
     <autoscroll-from-editor value="true" />
     <show-object-properties value="true" />
-    <loaded-nodes />
+    <loaded-nodes>
+      <connection connection-id="1dff2416-61d8-473b-82e1-8f172b07f22f">
+        <schema name="main" object-types="column, table, dataset trigger, index, view, constraint" />
+      </connection>
+    </loaded-nodes>
   </component>
   <component name="DBNavigator.Project.DatabaseConsoleManager">
-    <connection id="719b47db-2016-4bb9-858c-52e815894161">
-      <console name="SonyDB" type="STANDARD" schema="main" session="Main" />
+    <connection id="1dff2416-61d8-473b-82e1-8f172b07f22f">
+      <console name="Sony" type="STANDARD" schema="main" session="Main" />
     </connection>
   </component>
   <component name="DBNavigator.Project.DatabaseFileManager">
-    <open-files />
+    <open-files>
+      <object connection-id="1dff2416-61d8-473b-82e1-8f172b07f22f" object-ref="schemas/main/tables/gpsRecord" />
+    </open-files>
   </component>
   <component name="DBNavigator.Project.DatabaseSessionManager">
-    <connection id="719b47db-2016-4bb9-858c-52e815894161" />
+    <connection id="1dff2416-61d8-473b-82e1-8f172b07f22f" />
   </component>
   <component name="DBNavigator.Project.DatasetFilterManager">
-    <filter-actions connection-id="719b47db-2016-4bb9-858c-52e815894161" dataset="main.gpsRecord" active-filter-id="EMPTY_FILTER" />
+    <filter-actions connection-id="1dff2416-61d8-473b-82e1-8f172b07f22f" dataset="main.gpsRecord" active-filter-id="EMPTY_FILTER" />
   </component>
   <component name="DBNavigator.Project.EditorStateManager">
     <last-used-providers />
@@ -62,9 +68,9 @@
   </component>
   <component name="DBNavigator.Project.Settings">
     <connections>
-      <connection id="719b47db-2016-4bb9-858c-52e815894161" active="true">
+      <connection id="1dff2416-61d8-473b-82e1-8f172b07f22f" active="true">
         <database>
-          <name value="SonyDB" />
+          <name value="Sony" />
           <description value="" />
           <database-type value="SQLITE" />
           <config-type value="BASIC" />
