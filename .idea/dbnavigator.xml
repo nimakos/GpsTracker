@@ -16,28 +16,22 @@
       <scope value="GLOBAL" />
       <destination value="FILE" />
       <format value="CSV" />
-      <charset value="UTF-8" />
+      <charset value="windows-1252" />
     </export-instructions>
   </component>
   <component name="DBNavigator.Project.DatabaseBrowserManager">
     <autoscroll-to-editor value="false" />
     <autoscroll-from-editor value="true" />
     <show-object-properties value="true" />
-    <loaded-nodes>
-      <connection connection-id="1dff2416-61d8-473b-82e1-8f172b07f22f">
-        <schema name="main" object-types="column, table, dataset trigger, index, view, constraint" />
-      </connection>
-    </loaded-nodes>
+    <loaded-nodes />
   </component>
   <component name="DBNavigator.Project.DatabaseConsoleManager">
     <connection id="1dff2416-61d8-473b-82e1-8f172b07f22f">
-      <console name="Sony" type="STANDARD" schema="main" session="Main" />
+      <console name="Sony" type="STANDARD" schema="" session="Main" />
     </connection>
   </component>
   <component name="DBNavigator.Project.DatabaseFileManager">
-    <open-files>
-      <object connection-id="1dff2416-61d8-473b-82e1-8f172b07f22f" object-ref="schemas/main/tables/gpsRecord" />
-    </open-files>
+    <open-files />
   </component>
   <component name="DBNavigator.Project.DatabaseSessionManager">
     <connection id="1dff2416-61d8-473b-82e1-8f172b07f22f" />
