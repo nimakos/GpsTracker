@@ -254,19 +254,19 @@ public class MainActivity extends PermissionsManager implements GPSListener, Sen
                         if (!selectMeters.getText().toString().equals("")) {
                             startGps(0, Integer.valueOf(selectMeters.getText().toString()));
                         } else {
-                            Toast.makeText(this, "Παρακαλώ συμπληρώστε πρώτα τα μέτρα", Toast.LENGTH_LONG).show();
+                            displayToastMessage("Παρακαλώ συμπληρώστε πρώτα τα μέτρα");
                             on_off_switch.setChecked(false);
                         }
                     } else {
                         if (!selectSeconds.getText().toString().equals("")) {
                             startGps(Integer.valueOf(selectSeconds.getText().toString()) * 1000, 0);
                         } else {
-                            Toast.makeText(this, "Παρακαλώ συμπληρώστε πρώτα τα δευτερόλεπτα", Toast.LENGTH_LONG).show();
+                            displayToastMessage("Παρακαλώ συμπληρώστε πρώτα τα δευτερόλεπτα");
                             on_off_switch.setChecked(false);
                         }
                     }
                 else {
-                    Toast.makeText(this, "Παρακαλώ επιλέξτε πρώτα την κατεύθυνση", Toast.LENGTH_LONG).show();
+                    displayToastMessage("Παρακαλώ επιλέξτε πρώτα την κατεύθυνση");
                     on_off_switch.setChecked(false);
                 }
             } else {
@@ -294,7 +294,7 @@ public class MainActivity extends PermissionsManager implements GPSListener, Sen
         Constructor constructor = new Constructor();
         String contents = constructor.createRequestData(9998, listEntity);
         constructor.writeFile(constructor.getDatafilesOut(), new Date() + "_dbList.xml", contents.getBytes());
-        Toast.makeText(this, "Οι εγγραφές εστάλησαν", Toast.LENGTH_LONG).show();
+        displayToastMessage("Οι εγγραφές εστάλησαν");
     }
 
     public void deleteRecords(View view) {
@@ -303,13 +303,13 @@ public class MainActivity extends PermissionsManager implements GPSListener, Sen
                 switch (which) {
                     case DialogInterface.BUTTON_POSITIVE:
                         DatabaseInitializer.deleteGpsRecords(AppDatabase.getAppDatabase(MainActivity.this), selectRoadSpinner.getSelectedItem().id);
-                        Toast.makeText(MainActivity.this, "Οι εγγραφές διεγράφησαν", Toast.LENGTH_LONG).show();
+                        displayToastMessage("Οι εγγραφές διεγράφησαν");
                         break;
                     case DialogInterface.BUTTON_NEGATIVE:
                         break;
                 }
             } else {
-                Toast.makeText(MainActivity.this, "Παρακαλώ επιλέξτε πρώτα την κατεύθυνση", Toast.LENGTH_LONG).show();
+                displayToastMessage("Παρακαλώ επιλέξτε πρώτα την κατεύθυνση");
             }
         };
 
@@ -317,5 +317,9 @@ public class MainActivity extends PermissionsManager implements GPSListener, Sen
         builder.setMessage("Είσαι σίγουρος ότι θέλεις να διαγραφούν οι εγγραφές που αφορούν " + "'" + selectRoadSpinner.getSelectedItem().data + "'").setPositiveButton("Yes", dialogClickListener)
                 .setNegativeButton("No", dialogClickListener).show();
 
+    }
+
+    public void displayToastMessage(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
     }
 }
