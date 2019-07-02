@@ -34,6 +34,7 @@ public class GPSManager implements GpsStatus.Listener, LocationListener {
     private GPSListener gpsListener;
     private Context mContext;
     private MyGPSModel myGPSModel;
+    private final float MPS_to_KPH = 3.6f;
 
     // Instance
     @SuppressLint("StaticFieldLeak")
@@ -192,7 +193,9 @@ public class GPSManager implements GpsStatus.Listener, LocationListener {
     public void onLocationChanged(Location location) {
         if (location != null) {
             gpsListener.getLocation(location);
-            gpsListener.getSpeed((location.getSpeed() * 3600) / 1000);
+            gpsListener.getSpeed(location.getSpeed() * MPS_to_KPH);
+        } else {
+            gpsListener.getSpeed(0.0f);
         }
     }
 

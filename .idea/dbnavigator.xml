@@ -10,12 +10,12 @@
       <create-header value="true" />
       <quote-values-containing-separator value="false" />
       <quote-all-values value="false" />
-      <value-separator value="," />
-      <file-name value="gpsRecordChalkida.csv" />
+      <value-separator value="" />
+      <file-name value="gpsRecord.xls" />
       <file-location value="C:\Users\vnikolis\Desktop" />
       <scope value="GLOBAL" />
       <destination value="FILE" />
-      <format value="CSV" />
+      <format value="EXCEL" />
       <charset value="windows-1253" />
     </export-instructions>
   </component>
@@ -23,7 +23,11 @@
     <autoscroll-to-editor value="false" />
     <autoscroll-from-editor value="true" />
     <show-object-properties value="true" />
-    <loaded-nodes />
+    <loaded-nodes>
+      <connection connection-id="1dff2416-61d8-473b-82e1-8f172b07f22f">
+        <schema name="main" object-types="index, column, dataset trigger, table, view, constraint" />
+      </connection>
+    </loaded-nodes>
   </component>
   <component name="DBNavigator.Project.DatabaseConsoleManager">
     <connection id="1dff2416-61d8-473b-82e1-8f172b07f22f">
@@ -31,7 +35,9 @@
     </connection>
   </component>
   <component name="DBNavigator.Project.DatabaseFileManager">
-    <open-files />
+    <open-files>
+      <object connection-id="1dff2416-61d8-473b-82e1-8f172b07f22f" object-ref="schemas/main/tables/gpsRecord" />
+    </open-files>
   </component>
   <component name="DBNavigator.Project.DatabaseSessionManager">
     <connection id="1dff2416-61d8-473b-82e1-8f172b07f22f" />
