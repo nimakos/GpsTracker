@@ -114,7 +114,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/speed" />
 
-        <gr.vaggelis.myapplication.spinner.Spinner
+        <gr.invision.gpstracker.spinner.Spinner
             android:id="@+id/road_spinner"
             android:layout_width="135dp"
             android:layout_height="29dp"

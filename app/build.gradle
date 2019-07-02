@@ -3,7 +3,7 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 28
     defaultConfig {
-        applicationId "gr.vaggelis.myapplication"
+        applicationId "gr.invision.gpstracker"
         minSdkVersion 23
         targetSdkVersion 28
         versionCode 1
