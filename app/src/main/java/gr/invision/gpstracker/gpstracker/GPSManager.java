@@ -34,7 +34,7 @@ public class GPSManager implements GpsStatus.Listener, LocationListener {
     private GPSListener gpsListener;
     private Context mContext;
     private MyGPSModel myGPSModel;
-    private final float MPS_to_KPH = 3.6f;
+    private static final float MPS_to_KPH = 3.6f;
 
     // Instance
     @SuppressLint("StaticFieldLeak")
