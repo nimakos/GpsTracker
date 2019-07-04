@@ -11,90 +11,109 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center|center_horizontal|top"
-        android:orientation="horizontal">
+        android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/longitute"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:text="Longitude"
-            android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:gravity="center|center_horizontal|top"
+            android:orientation="horizontal">
 
-        <TextView
-            android:id="@+id/longitudeValue"
-            android:layout_width="wrap_content"
+            <TextView
+                android:id="@+id/longitute"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Longitude:"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <LinearLayout
+                android:layout_width="115dp"
+                android:layout_height="wrap_content"
+                android:gravity="center|center_horizontal|top"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/longitudeValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="0.0"
+                    app:layout_constraintStart_toEndOf="@+id/longitute"
+                    app:layout_constraintTop_toTopOf="parent" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="32dp"
-            android:layout_marginTop="16dp"
-            android:text="0.0"
-            app:layout_constraintStart_toEndOf="@+id/longitute"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:gravity="center|center_horizontal|top"
+            android:orientation="horizontal">
 
-    </LinearLayout>
+            <TextView
+                android:id="@+id/latitude"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Latitude:    "
+                android:textStyle="bold"
+                app:layout_constraintStart_toEndOf="@+id/longitute"
+                app:layout_constraintTop_toTopOf="parent" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center|center_horizontal|top"
-        android:orientation="horizontal">
+            <LinearLayout
+                android:layout_width="115dp"
+                android:layout_height="wrap_content"
+                android:gravity="center|center_horizontal|top"
+                android:orientation="horizontal">
 
-        <TextView
-            android:id="@+id/latitude"
-            android:layout_width="wrap_content"
+                <TextView
+                    android:id="@+id/latitudeValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="0.0"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/longitudeValue"
+                    app:layout_constraintTop_toTopOf="parent" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:text="Latitude"
-            android:textStyle="bold"
-            app:layout_constraintStart_toEndOf="@+id/longitute"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:gravity="center|center_horizontal|top"
 
-        <TextView
-            android:id="@+id/latitudeValue"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="42dp"
-            android:layout_marginTop="16dp"
-            android:text="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/longitudeValue"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:orientation="horizontal">
 
-    </LinearLayout>
+            <TextView
+                android:id="@+id/speed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Speed:       "
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/latitude" />
 
+            <LinearLayout
+                android:layout_width="115dp"
+                android:layout_height="wrap_content"
+                android:gravity="center|center_horizontal|top"
+                android:orientation="horizontal">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:gravity="center|center_horizontal|top"
-        android:orientation="horizontal">
-
-        <TextView
-            android:id="@+id/speed"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:text="Speed"
-            android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/latitude" />
-
-        <TextView
-            android:id="@+id/speedValue"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="52dp"
-            android:layout_marginTop="16dp"
-            android:text="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/latitudeValue" />
-
+                <TextView
+                    android:id="@+id/speedValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="0.0"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/latitudeValue" />
+            </LinearLayout>
+        </LinearLayout>
     </LinearLayout>
 
 
