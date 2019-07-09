@@ -1,5 +1,5 @@
 # GpsTracker
-# IDE: Androis Studio 3.4.1.
+# IDE: Android Studio 3.4.1.
 # Language : JAVA
 # API : Room
 # Android Application
