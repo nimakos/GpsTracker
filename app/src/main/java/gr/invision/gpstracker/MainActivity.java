@@ -17,6 +17,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -190,7 +191,20 @@ public class MainActivity extends PermissionsManager implements GPSListener, Sen
 
     @Override
     public void getSpeed(float myCurrentSpeed) {
-        speed.setText(String.valueOf(myCurrentSpeed));
+        speed.setText(String.valueOf(round(myCurrentSpeed, 2)));
+    }
+
+    /**
+     * Round to certain number of decimals
+     *
+     * @param d            The number you want to round
+     * @param decimalPlace The number of decimal points
+     * @return The rounded number
+     */
+    public static float round(float d, int decimalPlace) {
+        BigDecimal bd = new BigDecimal(Float.toString(d));
+        bd = bd.setScale(decimalPlace, BigDecimal.ROUND_HALF_UP);
+        return bd.floatValue();
     }
 
     @Override
