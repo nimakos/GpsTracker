@@ -11,7 +11,7 @@ import java.util.List;
 
 import gr.invision.gpstracker.R;
 
-public class Spinner extends android.support.v7.widget.AppCompatSpinner {
+public class Spinner extends androidx.appcompat.widget.AppCompatSpinner {
 
     /**
      * Interface declaration

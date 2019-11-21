@@ -8,7 +8,7 @@ import android.hardware.SensorEvent;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
+import com.google.android.material.snackbar.Snackbar;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.CompoundButton;

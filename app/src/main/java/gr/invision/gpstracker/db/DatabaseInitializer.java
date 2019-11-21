@@ -2,7 +2,7 @@ package gr.invision.gpstracker.db;
 
 import android.graphics.Movie;
 import android.os.AsyncTask;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.util.Log;
 
 import java.util.List;

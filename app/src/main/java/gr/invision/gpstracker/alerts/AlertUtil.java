@@ -37,7 +37,7 @@ public class AlertUtil {
         };
 
         Resources res = context.getResources();
-        android.support.v7.app.AlertDialog.Builder alert = new android.support.v7.app.AlertDialog.Builder(context);
+        androidx.appcompat.app.AlertDialog.Builder alert = new androidx.appcompat.app.AlertDialog.Builder(context);
         alert.setTitle("GPS Settings");
 
         LinearLayout base = new LinearLayout(context);
@@ -68,7 +68,7 @@ public class AlertUtil {
             userClickedOK[0] = false;
         });
         // Create and show dialog
-        android.support.v7.app.AlertDialog alertDialog = alert.create();
+        androidx.appcompat.app.AlertDialog alertDialog = alert.create();
         alertDialog.setCanceledOnTouchOutside(false);
         alertDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         try{
