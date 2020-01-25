@@ -1,4 +1,4 @@
-package gr.invision.gpstracker.permissionstracker;
+package gr.invision.gpstracker.permissions;
 
 import android.content.Intent;
 import android.content.pm.PackageManager;
