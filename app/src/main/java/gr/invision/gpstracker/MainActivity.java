@@ -38,11 +38,10 @@ import gr.invision.gpstracker.internettracker.InternetConnectionManager;
 import gr.invision.gpstracker.internettracker.InternetListener;
 import gr.invision.gpstracker.permissions.PermissionsManager;
 import gr.invision.gpstracker.sensortracker.MySensorManager;
-import gr.invision.gpstracker.sensortracker.SensorListener;
 import gr.invision.gpstracker.spinner.DataEntry;
 import gr.invision.gpstracker.spinner.Spinner;
 
-public class MainActivity extends PermissionsManager implements GPSListener, SensorListener, InternetListener, CompoundButton.OnCheckedChangeListener, GoogleLocation.OnLocationUpdate {
+public class MainActivity extends PermissionsManager implements GPSListener, MySensorManager.SensorListener, InternetListener, CompoundButton.OnCheckedChangeListener, GoogleLocation.OnLocationUpdate {
 
     Spinner selectRoadSpinner;
     private static final int REQUEST_PERMISSION = 10;

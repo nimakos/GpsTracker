@@ -19,7 +19,12 @@ import java.lang.ref.WeakReference;
 
 public class GoogleLocation extends LocationCallback implements OnSuccessListener<Location>, LocationListener {
 
+    public interface OnLocationUpdate {
+        void getGoogleLocationUpdate(Location location);
+    }
+
     private static final long UPDATE_INTERVAL = 15000;  /* 15 secs */
+
     private static final long FASTEST_INTERVAL = 5000; /* 5 secs */
 
     private FusedLocationProviderClient fusedLocationProviderClient;
@@ -76,9 +81,5 @@ public class GoogleLocation extends LocationCallback implements OnSuccessListene
 
     public void stopLocationUpdates() {
         fusedLocationProviderClient.removeLocationUpdates(this);
-    }
-
-    public interface OnLocationUpdate {
-        void getGoogleLocationUpdate(Location location);
     }
 }
