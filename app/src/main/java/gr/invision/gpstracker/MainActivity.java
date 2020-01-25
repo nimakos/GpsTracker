@@ -35,7 +35,7 @@ import gr.invision.gpstracker.gpstracker.GPSListener;
 import gr.invision.gpstracker.gpstracker.GPSManager;
 import gr.invision.gpstracker.internettracker.InternetConnectionManager;
 import gr.invision.gpstracker.internettracker.InternetListener;
-import gr.invision.gpstracker.permissionstracker.PermissionsManager;
+import gr.invision.gpstracker.permissions.PermissionsManager;
 import gr.invision.gpstracker.sensortracker.MySensorManager;
 import gr.invision.gpstracker.sensortracker.SensorListener;
 import gr.invision.gpstracker.spinner.DataEntry;
@@ -108,8 +108,8 @@ public class MainActivity extends PermissionsManager implements GPSListener, Sen
     }
 
     private void startGps(int milliSeconds, int meters) {
-        myGpsManager = GPSManager.getInstance(this, milliSeconds, meters);
-        myGpsManager.setGPSListener(this);
+        myGpsManager = GPSManager.getInstance(milliSeconds, meters);
+        myGpsManager.init(this, this);
     }
 
     private void startInternetManager() {
