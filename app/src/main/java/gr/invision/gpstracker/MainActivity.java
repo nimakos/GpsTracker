@@ -32,21 +32,21 @@ import gr.invision.gpstracker.db.DatabaseInitializer;
 import gr.invision.gpstracker.db.databaseHolder.AppDatabase;
 import gr.invision.gpstracker.db.entity.GpsRecord;
 import gr.invision.gpstracker.gpstracker.GPSListener;
-import gr.invision.gpstracker.gpstracker.GPSManager;
+import gr.invision.gpstracker.gpstracker.MyGPSManager;
 import gr.invision.gpstracker.gpstracker.googleapi.GoogleLocation;
-import gr.invision.gpstracker.internettracker.ConnectionManager;
+import gr.invision.gpstracker.internettracker.MyConnectionManager;
 import gr.invision.gpstracker.permissions.PermissionsManager;
-import gr.invision.gpstracker.sensortracker.SensorManager;
+import gr.invision.gpstracker.sensortracker.MySensorManager;
 import gr.invision.gpstracker.spinner.DataEntry;
 import gr.invision.gpstracker.spinner.Spinner;
 
-public class MainActivity extends PermissionsManager implements GPSListener, SensorManager.SensorListener, ConnectionManager.InternetListener, CompoundButton.OnCheckedChangeListener, GoogleLocation.OnLocationUpdate {
+public class MainActivity extends PermissionsManager implements GPSListener, MySensorManager.SensorListener, MyConnectionManager.InternetListener, CompoundButton.OnCheckedChangeListener, GoogleLocation.OnLocationUpdate {
 
     Spinner selectRoadSpinner;
     private static final int REQUEST_PERMISSION = 10;
-    GPSManager myGpsManager;
-    ConnectionManager connectionManager;
-    SensorManager sensorManager;
+    MyGPSManager myGpsManager;
+    MyConnectionManager myConnectionManager;
+    MySensorManager mySensorManager;
     TextView speed, longitude, latitude;
     String[] permissions = {
             Manifest.permission.ACCESS_NETWORK_STATE,
@@ -78,7 +78,7 @@ public class MainActivity extends PermissionsManager implements GPSListener, Sen
         startInternetManager();
         startSensor();
         Constructor.createDatafilesOut();
-        new GoogleLocation(this).registerLocationListener(this);
+        //new GoogleLocation(this).registerLocationListener(this);
     }
 
     @Override
@@ -251,34 +251,28 @@ public class MainActivity extends PermissionsManager implements GPSListener, Sen
     }
 
     private void startGps(int milliSeconds, int meters) {
-        myGpsManager = GPSManager.getInstance(milliSeconds, meters);
-        myGpsManager.init(this, this);
+        myGpsManager = MyGPSManager.getInstance(this, this, milliSeconds, meters);
     }
 
     private void stopGps() {
-        try {
-            if (myGpsManager != null)
-                myGpsManager.stopLocation();
-        } catch (NullPointerException ignore) {
-        }
+        myGpsManager.destroyInstance();
     }
 
     private void startSensor() {
-        sensorManager = SensorManager.getInstance(this);
-        sensorManager.setSensorListener(this);
+        mySensorManager = MySensorManager.getInstance(this, this);
     }
 
     private void stopSensor() {
-        sensorManager.destroyInstance();
+        mySensorManager.destroyInstance();
     }
 
     private void startInternetManager() {
-        connectionManager = new ConnectionManager(this);
-        connectionManager.setInternetListener(this);
+        myConnectionManager = new MyConnectionManager(this);
+        myConnectionManager.setInternetListener(this);
     }
 
     private void stopInternetManager() {
-        connectionManager = null;
+        myConnectionManager = null;
     }
 
     private String getDatetime() {

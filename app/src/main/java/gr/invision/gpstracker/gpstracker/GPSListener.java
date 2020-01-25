@@ -3,7 +3,7 @@ package gr.invision.gpstracker.gpstracker;
 import android.location.Location;
 
 /**
- * Callback interface to receive GPS updates from GPSManager.
+ * Callback interface to receive GPS updates from MyGPSManager.
  */
 public interface GPSListener {
     void getLocation(Location location);

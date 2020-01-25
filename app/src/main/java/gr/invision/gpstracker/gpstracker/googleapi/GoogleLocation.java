@@ -23,16 +23,13 @@ public class GoogleLocation extends LocationCallback implements OnSuccessListene
     }
 
     private static final long UPDATE_INTERVAL = 15000;  /* 15 secs */
-
     private static final long FASTEST_INTERVAL = 5000; /* 5 secs */
-
     private FusedLocationProviderClient fusedLocationProviderClient;
-
     private OnLocationUpdate onLocationUpdate;
 
     public GoogleLocation(Context context) {
         WeakReference<Context> contextWeakReference = new WeakReference<>(context);
-        startLocationUpdates(contextWeakReference.get());
+        init(contextWeakReference.get());
     }
 
     @Override
@@ -59,7 +56,7 @@ public class GoogleLocation extends LocationCallback implements OnSuccessListene
         this.onLocationUpdate = onLocationUpdate;
     }
 
-    private void startLocationUpdates(Context context) {
+    private void init(Context context) {
         LocationRequest locationRequest = new LocationRequest();
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         locationRequest.setInterval(UPDATE_INTERVAL);

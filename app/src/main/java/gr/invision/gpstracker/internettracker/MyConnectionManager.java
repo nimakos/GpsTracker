@@ -12,7 +12,7 @@ import java.lang.ref.WeakReference;
  *
  * @author emil http://stackoverflow.com/users/220710/emil
  */
-public class ConnectionManager {
+public class MyConnectionManager {
 
     public interface InternetListener {
         void checkConnection(boolean isConnected);
@@ -24,7 +24,7 @@ public class ConnectionManager {
     private static NetworkInfo info;
     private InternetListener listener;
 
-    public ConnectionManager(Context context) {
+    public MyConnectionManager(Context context) {
         WeakReference<Context> contextWeakReference = new WeakReference<>(context);
         ConnectivityManager cm = (ConnectivityManager) contextWeakReference.get().getSystemService(Context.CONNECTIVITY_SERVICE);
         if (cm != null) info = cm.getActiveNetworkInfo();

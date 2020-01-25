@@ -20,17 +20,18 @@ import androidx.core.app.ActivityCompat;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Check device's GPS settings and select the best provider
- * Call from main like:  GPSManager gpsManager = GPSManager.getInstance(this);
+ * Call from main like:  MyGPSManager gpsManager = MyGPSManager.getInstance(this);
  * along with:           gpsManager.init(this, this);
  */
-public class GPSManager implements GpsStatus.Listener, LocationListener {
+public class MyGPSManager implements GpsStatus.Listener, LocationListener {
 
     private static int myMinTime;
-    private static int MyMinDistance;
-    private boolean isGPSEnabled, isNetworkEnabled = false;
+    private static int myMinDistance;
+    private boolean isGPSEnabled, isNetworkEnabled;
     private LocationManager locationManager;
     private GPSListener gpsListener;
     private WeakReference<Context> contextWeakReference;
@@ -38,7 +39,7 @@ public class GPSManager implements GpsStatus.Listener, LocationListener {
     private static final float MPS_to_KPH = 3.6f;
 
     // Instance
-    private static GPSManager mInstance = null;
+    private static MyGPSManager INSTANCE;
 
     public enum GpsStatus {
         FAILED,
@@ -46,35 +47,40 @@ public class GPSManager implements GpsStatus.Listener, LocationListener {
         NETWORK_STARTED,
     }
 
+    private MyGPSManager(Context context, GPSListener gpsListener) {
+        contextWeakReference = new WeakReference<>(context);
+        this.gpsListener = gpsListener;
+        init();
+    }
+
     /**
      * Static accessor (Singleton pattern)
      *
      * @return instance
      */
-    public synchronized static GPSManager getInstance(int minTime, int minDistance) {
-        if (mInstance == null) {
-            mInstance = new GPSManager();
+    public synchronized static MyGPSManager getInstance(Context context, GPSListener gpsListener, int minTime, int minDistance) {
+        if (INSTANCE == null) {
+            INSTANCE = new MyGPSManager(new WeakReference<>(context).get(), gpsListener);
         }
         myMinTime = minTime;
-        MyMinDistance = minDistance;
-        return mInstance;
+        myMinDistance = minDistance;
+        return INSTANCE;
     }
 
     /**
-     * την χρησιμοποιούμε για να πάρουμε την απάντηση του Listener
-     *
-     * @param gpsListener Παίρνουμε τα GPS Updates από τον GPSListener
+     * Όταν η εφαρμογή φύγει από το MainActivity π.χ. πάει στο παρασκήνιο
      */
-    public void init(Context context, GPSListener gpsListener) {
-        this.contextWeakReference = new WeakReference<>(context);
-        this.gpsListener = gpsListener;
-        enableGPS();
+    public void destroyInstance() {
+        gpsListener = null;
+        locationManager.removeUpdates(this);
+        locationManager = null;
+        INSTANCE = null;
     }
 
-    private void enableGPS() {
+    private void init() {
         initLocationManager();
         checkIfNetworkOrGpsEnabled();
-        getLastKnownLocation2();
+        getLastKnownLocation();
         promptGpsEnable();
     }
 
@@ -88,23 +94,23 @@ public class GPSManager implements GpsStatus.Listener, LocationListener {
     }
 
 
-    private void getLastKnownLocation2() {
+    private void getLastKnownLocation() {
         if (ActivityCompat.checkSelfPermission(contextWeakReference.get(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(contextWeakReference.get(), android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions((Activity) contextWeakReference.get(), new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 101);
         }
-        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, myMinTime, MyMinDistance, this);
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, myMinTime, MyMinDistance, this);
+        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, myMinTime, myMinDistance, this);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, myMinTime, myMinDistance, this);
 
         GpsStatus gpsStatus;
         List<String> providers = locationManager.getProviders(true);
         Location bestLocation = null;
         for (String provider : providers) {
-            Location l = locationManager.getLastKnownLocation(provider);
-            if (l == null) {
+            Location location = locationManager.getLastKnownLocation(provider);
+            if (location == null) {
                 continue;
             }
-            if (bestLocation == null || l.getAccuracy() < bestLocation.getAccuracy()) {
-                bestLocation = l;
+            if (bestLocation == null || location.getAccuracy() < bestLocation.getAccuracy()) {
+                bestLocation = location;
             }
         }
         if (bestLocation == null) {
@@ -135,35 +141,40 @@ public class GPSManager implements GpsStatus.Listener, LocationListener {
         }
     }
 
-    /**
-     * Όταν η εφαρμογή φύγει από το MainActivity π.χ. πάει στο παρασκήνιο
-     */
-    public void stopLocation() {
-        try {
-            if (locationManager != null)
-                locationManager.removeUpdates(this);
-            locationManager = null;
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            Log.e("SOS", "Something went wrong");
-        }
-    }
-
     public void onGpsStatusChanged(int event) {
         int Satellites = 0;
         int SatellitesInFix = 0;
         if (ActivityCompat.checkSelfPermission(contextWeakReference.get(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(contextWeakReference.get(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions((Activity) contextWeakReference.get(), new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 101);
         }
-        int timeToFix = locationManager.getGpsStatus(null).getTimeToFirstFix();
+
+        int timeToFix = Objects.requireNonNull(locationManager.getGpsStatus(null)).getTimeToFirstFix();
         Log.i("GPs", "Time to first fix = " + timeToFix);
-        for (GpsSatellite sat : locationManager.getGpsStatus(null).getSatellites()) {
+        for (GpsSatellite sat : Objects.requireNonNull(locationManager.getGpsStatus(null)).getSatellites()) {
             if (sat.usedInFix()) {
                 SatellitesInFix++;
             }
             Satellites++;
         }
         Log.i("GPS", Satellites + " Used In Last Fix (" + SatellitesInFix + ")");
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        if (location != null) {
+            gpsListener.getLocation(location);
+            gpsListener.getSpeed(location.getSpeed() * MPS_to_KPH);
+        } else {
+            gpsListener.getSpeed(0.0f);
+        }
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+        if (provider.equals("gps") && !isGPSEnabled)
+            showSettingsAlert(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+        if (provider.equals("network") && !isNetworkEnabled && isGPSEnabled)
+            showSettingsAlert(Settings.ACTION_NETWORK_OPERATOR_SETTINGS);
     }
 
     /**
@@ -182,31 +193,11 @@ public class GPSManager implements GpsStatus.Listener, LocationListener {
     }
 
     @Override
-    public void onLocationChanged(Location location) {
-        if (location != null) {
-            gpsListener.getLocation(location);
-            gpsListener.getSpeed(location.getSpeed() * MPS_to_KPH);
-        } else {
-            gpsListener.getSpeed(0.0f);
-        }
-    }
-
-    @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
-
     }
 
     @Override
     public void onProviderEnabled(String provider) {
-
-    }
-
-    @Override
-    public void onProviderDisabled(String provider) {
-        if (provider.equals("gps") && !isGPSEnabled)
-            showSettingsAlert(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-        if (provider.equals("network") && !isNetworkEnabled && isGPSEnabled)
-            showSettingsAlert(Settings.ACTION_NETWORK_OPERATOR_SETTINGS);
     }
 
 
@@ -215,15 +206,15 @@ public class GPSManager implements GpsStatus.Listener, LocationListener {
     /**
      * Παίρνει την τρέχουσα τοποθεσία είτε μέσω Network είτε μέσω GPS για κάθε περίπτωση
      */
-    private MyGPSModel getLastKnownLocation1() {
+    private MyGPSModel getLastKnownLocationTest() {
         Location networkLocation = null, GpsLocation = null, finalLocation = null;
         GpsStatus gpsStatus;
 
         if (ActivityCompat.checkSelfPermission(contextWeakReference.get(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(contextWeakReference.get(), android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions((Activity) contextWeakReference.get(), new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 101);
         }
-        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, myMinTime, MyMinDistance, this);
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, myMinTime, MyMinDistance, this);
+        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, myMinTime, myMinDistance, this);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, myMinTime, myMinDistance, this);
 
         try {
             if (isNetworkEnabled) {
@@ -296,7 +287,7 @@ public class GPSManager implements GpsStatus.Listener, LocationListener {
     private void startNewLocation() {
         new Thread(() -> {
             while (true) {
-                Location location = getLastKnownLocation1().getLocation();
+                Location location = getLastKnownLocationTest().getLocation();
                 if (location != null) {
                     gpsListener.getLocationAsynchronous(location);
                 }

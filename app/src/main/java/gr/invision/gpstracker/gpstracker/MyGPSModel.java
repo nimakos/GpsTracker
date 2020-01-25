@@ -5,9 +5,9 @@ import android.location.Location;
 class MyGPSModel {
 
     private Location location;
-    private GPSManager.GpsStatus gpsStatus;
+    private MyGPSManager.GpsStatus gpsStatus;
 
-    MyGPSModel(Location location, GPSManager.GpsStatus gpsStatus) {
+    MyGPSModel(Location location, MyGPSManager.GpsStatus gpsStatus) {
         this.location = location;
         this.gpsStatus = gpsStatus;
     }
@@ -16,7 +16,7 @@ class MyGPSModel {
         return location;
     }
 
-    GPSManager.GpsStatus getGpsStatus() {
+    MyGPSManager.GpsStatus getGpsStatus() {
         return gpsStatus;
     }
 }
