@@ -3,7 +3,6 @@ package gr.invision.gpstracker.gpstracker.googleapi;
 import android.content.Context;
 import android.location.Location;
 import android.os.Looper;
-import android.util.Log;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -52,7 +51,7 @@ public class GoogleLocation extends LocationCallback implements OnSuccessListene
     public void onLocationChanged(Location location) {
         if (location != null) {
             onLocationUpdate.getGoogleLocationUpdate(location);
-            Log.e("LAT - LONG", String.valueOf(location.getLongitude()) + location.getLatitude());
+            //Log.e("LAT - LONG", String.valueOf(location.getLongitude()) + location.getLatitude());
         }
     }
 

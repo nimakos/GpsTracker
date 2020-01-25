@@ -34,20 +34,19 @@ import gr.invision.gpstracker.db.entity.GpsRecord;
 import gr.invision.gpstracker.gpstracker.GPSListener;
 import gr.invision.gpstracker.gpstracker.GPSManager;
 import gr.invision.gpstracker.gpstracker.googleapi.GoogleLocation;
-import gr.invision.gpstracker.internettracker.InternetConnectionManager;
-import gr.invision.gpstracker.internettracker.InternetListener;
+import gr.invision.gpstracker.internettracker.ConnectionManager;
 import gr.invision.gpstracker.permissions.PermissionsManager;
-import gr.invision.gpstracker.sensortracker.MySensorManager;
+import gr.invision.gpstracker.sensortracker.SensorManager;
 import gr.invision.gpstracker.spinner.DataEntry;
 import gr.invision.gpstracker.spinner.Spinner;
 
-public class MainActivity extends PermissionsManager implements GPSListener, MySensorManager.SensorListener, InternetListener, CompoundButton.OnCheckedChangeListener, GoogleLocation.OnLocationUpdate {
+public class MainActivity extends PermissionsManager implements GPSListener, SensorManager.SensorListener, ConnectionManager.InternetListener, CompoundButton.OnCheckedChangeListener, GoogleLocation.OnLocationUpdate {
 
     Spinner selectRoadSpinner;
     private static final int REQUEST_PERMISSION = 10;
     GPSManager myGpsManager;
-    InternetConnectionManager internetConnectionManager;
-    MySensorManager mySensorManager;
+    ConnectionManager connectionManager;
+    SensorManager sensorManager;
     TextView speed, longitude, latitude;
     String[] permissions = {
             Manifest.permission.ACCESS_NETWORK_STATE,
@@ -64,6 +63,7 @@ public class MainActivity extends PermissionsManager implements GPSListener, MyS
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
     }
 
     @Override
@@ -86,6 +86,7 @@ public class MainActivity extends PermissionsManager implements GPSListener, MyS
         super.onStop();
         stopSensor();
         stopInternetManager();
+        System.gc();
     }
 
     @Override
@@ -95,6 +96,7 @@ public class MainActivity extends PermissionsManager implements GPSListener, MyS
         AppDatabase.destroyInstance();
         stopSensor();
         stopInternetManager();
+        System.gc();
     }
 
 
@@ -161,17 +163,17 @@ public class MainActivity extends PermissionsManager implements GPSListener, MyS
 
     @Override
     public void checkWifiConnection(boolean isConnected) {
-
+        System.out.println();
     }
 
     @Override
     public void checkMobileConnection(boolean isConnected) {
-
+        System.out.println();
     }
 
     @Override
     public void checkSpeedConnection(boolean isConnectedFast) {
-
+        System.out.println();
     }
 
     @Override
@@ -233,7 +235,6 @@ public class MainActivity extends PermissionsManager implements GPSListener, MyS
     }
 
     private void setUI() {
-        setContentView(R.layout.activity_main);
         speed = findViewById(R.id.speedValue);
         longitude = findViewById(R.id.longitudeValue);
         latitude = findViewById(R.id.latitudeValue);
@@ -263,21 +264,21 @@ public class MainActivity extends PermissionsManager implements GPSListener, MyS
     }
 
     private void startSensor() {
-        mySensorManager = MySensorManager.getInstance(this);
-        mySensorManager.setSensorListener(this);
+        sensorManager = SensorManager.getInstance(this);
+        sensorManager.setSensorListener(this);
     }
 
     private void stopSensor() {
-        mySensorManager.destroyInstance();
+        sensorManager.destroyInstance();
     }
 
     private void startInternetManager() {
-        internetConnectionManager = new InternetConnectionManager(this);
-        internetConnectionManager.setInternetListener(this);
+        connectionManager = new ConnectionManager(this);
+        connectionManager.setInternetListener(this);
     }
 
     private void stopInternetManager() {
-        internetConnectionManager = null;
+        connectionManager = null;
     }
 
     private String getDatetime() {

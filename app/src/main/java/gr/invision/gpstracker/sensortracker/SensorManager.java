@@ -4,11 +4,10 @@ import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
 
 import java.lang.ref.WeakReference;
 
-public class MySensorManager implements SensorEventListener {
+public class SensorManager implements SensorEventListener {
 
     public interface SensorListener {
         void onSensorChanged(SensorEvent sensorEvent);
@@ -19,20 +18,26 @@ public class MySensorManager implements SensorEventListener {
 
     private SensorListener sensorListener;
 
-    private SensorManager sensorManager;
+    private android.hardware.SensorManager sensorManager;
 
-    private static MySensorManager INSTANCE;
+    private static SensorManager INSTANCE;
 
-    private MySensorManager(Context context) {
+    private SensorManager(Context context) {
         initSensors(context);
     }
 
-    public static MySensorManager getInstance(Context context) {
+    public synchronized static SensorManager getInstance(Context context) {
         WeakReference<Context> contextWeakReference = new WeakReference<>(context);
         if (INSTANCE == null) {
-            INSTANCE = new MySensorManager(contextWeakReference.get());
+            INSTANCE = new SensorManager(contextWeakReference.get());
         }
         return INSTANCE;
+    }
+
+    public void destroyInstance() {
+        setSensorListener(null);
+        sensorManager.unregisterListener(this);
+        INSTANCE = null;
     }
 
     public void setSensorListener(SensorListener sensorListener) {
@@ -40,12 +45,12 @@ public class MySensorManager implements SensorEventListener {
     }
 
     private void initSensors(Context context) {
-        sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
+        sensorManager = (android.hardware.SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
         if (sensorManager != null){
             Sensor accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
             Sensor lightSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
-            sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
-            sensorManager.registerListener(this, lightSensor, SensorManager.SENSOR_DELAY_NORMAL);
+            sensorManager.registerListener(this, accelerometer, android.hardware.SensorManager.SENSOR_DELAY_NORMAL);
+            sensorManager.registerListener(this, lightSensor, android.hardware.SensorManager.SENSOR_DELAY_NORMAL);
         }
     }
 
@@ -69,11 +74,5 @@ public class MySensorManager implements SensorEventListener {
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
         sensorListener.onAccuracyChanged(sensor, accuracy);
-    }
-
-    public void destroyInstance() {
-        setSensorListener(null);
-        sensorManager.unregisterListener(this);
-        INSTANCE = null;
     }
 }

@@ -5,18 +5,37 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.telephony.TelephonyManager;
 
+import java.lang.ref.WeakReference;
+
 /**
  * Check device's network connectivity and speed
  *
  * @author emil http://stackoverflow.com/users/220710/emil
  */
-public class InternetConnectionManager {
+public class ConnectionManager {
+
+    public interface InternetListener {
+        void checkConnection(boolean isConnected);
+        void checkWifiConnection(boolean isConnected);
+        void checkMobileConnection(boolean isConnected);
+        void checkSpeedConnection(boolean isConnectedFast);
+    }
+
     private static NetworkInfo info;
     private InternetListener listener;
 
-    public InternetConnectionManager(Context context) {
-        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+    public ConnectionManager(Context context) {
+        WeakReference<Context> contextWeakReference = new WeakReference<>(context);
+        ConnectivityManager cm = (ConnectivityManager) contextWeakReference.get().getSystemService(Context.CONNECTIVITY_SERVICE);
         if (cm != null) info = cm.getActiveNetworkInfo();
+    }
+
+    public void setInternetListener(InternetListener listener) {
+        this.listener = listener;
+        isConnected();
+        isConnectedFast();
+        isConnectedMobile();
+        isConnectedWifi();
     }
 
     /**
@@ -98,13 +117,5 @@ public class InternetConnectionManager {
         } else {
             return false;
         }
-    }
-
-    public void setInternetListener(InternetListener listener) {
-        this.listener = listener;
-        isConnected();
-        isConnectedFast();
-        isConnectedMobile();
-        isConnectedWifi();
     }
 }
