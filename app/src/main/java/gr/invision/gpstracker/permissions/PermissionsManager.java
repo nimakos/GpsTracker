@@ -40,8 +40,9 @@ public abstract class PermissionsManager extends AppCompatActivity {
 
         if (permissionCheck != PackageManager.PERMISSION_GRANTED)
             ActivityCompat.requestPermissions(this, requestedPermissions, requestCode);
-        else
+        else{
             onPermissionsGranted(requestCode);
+        }
     }
 
     @Override

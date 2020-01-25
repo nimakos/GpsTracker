@@ -33,6 +33,7 @@ import gr.invision.gpstracker.db.databaseHolder.AppDatabase;
 import gr.invision.gpstracker.db.entity.GpsRecord;
 import gr.invision.gpstracker.gpstracker.GPSListener;
 import gr.invision.gpstracker.gpstracker.GPSManager;
+import gr.invision.gpstracker.gpstracker.googleapi.GoogleLocation;
 import gr.invision.gpstracker.internettracker.InternetConnectionManager;
 import gr.invision.gpstracker.internettracker.InternetListener;
 import gr.invision.gpstracker.permissions.PermissionsManager;
@@ -41,11 +42,10 @@ import gr.invision.gpstracker.sensortracker.SensorListener;
 import gr.invision.gpstracker.spinner.DataEntry;
 import gr.invision.gpstracker.spinner.Spinner;
 
-public class MainActivity extends PermissionsManager implements GPSListener, SensorListener, InternetListener, CompoundButton.OnCheckedChangeListener {
+public class MainActivity extends PermissionsManager implements GPSListener, SensorListener, InternetListener, CompoundButton.OnCheckedChangeListener, GoogleLocation.OnLocationUpdate {
 
     Spinner selectRoadSpinner;
     private static final int REQUEST_PERMISSION = 10;
-    private static boolean HAVE_ALL_PERMISSIONS = false;
     GPSManager myGpsManager;
     InternetConnectionManager internetConnectionManager;
     MySensorManager mySensorManager;
@@ -65,105 +65,43 @@ public class MainActivity extends PermissionsManager implements GPSListener, Sen
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setPermissions();
     }
 
-    private List<DataEntry<String>> getSpinnerItems() {
-        List<DataEntry<String>> items = new ArrayList<>();
-        items.add(new DataEntry<>(1, "Σχηματάρι"));
-        items.add(new DataEntry<>(2, "Χαλκίδα"));
-        items.add(new DataEntry<>(3, "Τέστ"));
-        return items;
+    @Override
+    protected void onStart() {
+        super.onStart();
+        setPermissions();
     }
 
     @Override
     public void onPermissionsGranted(int requestCode) {
-        HAVE_ALL_PERMISSIONS = true;
         setUI();
         startInternetManager();
         startSensor();
         Constructor.createDatafilesOut();
+        new GoogleLocation(this).registerLocationListener(this);
     }
 
-    private void setPermissions() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-            requestAppPermissions(permissions, R.string.permission, REQUEST_PERMISSION);
+    @Override
+    protected void onStop() {
+        super.onStop();
+        stopSensor();
+        stopInternetManager();
     }
-
-    private void setUI() {
-        setContentView(R.layout.activity_main);
-        speed = findViewById(R.id.speedValue);
-        longitude = findViewById(R.id.longitudeValue);
-        latitude = findViewById(R.id.latitudeValue);
-        selectRoadSpinner = findViewById(R.id.road_spinner);
-        on_off_switch = findViewById(R.id.openGpsSwitch);
-        meters_seconds_switch = findViewById(R.id.meters_seconds_switch);
-        meters_seconds_switch.setOnCheckedChangeListener(this);
-        selectSeconds = findViewById(R.id.secondsEditText);
-        selectMeters = findViewById(R.id.metersEditText);
-        on_off_switch.setOnCheckedChangeListener(this);
-        selectRoadSpinner.setItems(getSpinnerItems());
-        selectMeters.setVisibility(View.GONE);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-    }
-
-    private void startGps(int milliSeconds, int meters) {
-        myGpsManager = GPSManager.getInstance(milliSeconds, meters);
-        myGpsManager.init(this, this);
-    }
-
-    private void startInternetManager() {
-        internetConnectionManager = new InternetConnectionManager(this);
-        internetConnectionManager.setInternetListener(this);
-    }
-
-    private void startSensor() {
-        mySensorManager = new MySensorManager(this);
-        mySensorManager.setSensorListener(this);
-    }
-
-    private void stopSensor() {
-        try {
-            if (mySensorManager != null)
-                mySensorManager.stopSensors();
-        } catch (NullPointerException ignore) {
-        }
-    }
-
-    private void stopInternetManager() {
-        internetConnectionManager = null;
-    }
-
-    private void stopGps() {
-        try {
-            if (myGpsManager != null)
-                myGpsManager.stopLocation();
-        } catch (NullPointerException ignore) {
-        }
-    }
-
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         selectRoadSpinner.clear();
         AppDatabase.destroyInstance();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (HAVE_ALL_PERMISSIONS) {
-            mySensorManager.resumeSensors();
-            startInternetManager();
-        }
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
         stopSensor();
         stopInternetManager();
+    }
+
+
+    @Override
+    public void getGoogleLocationUpdate(Location location) {
+
     }
 
     @Override
@@ -183,35 +121,15 @@ public class MainActivity extends PermissionsManager implements GPSListener, Sen
         latitude.setText(String.valueOf(location.getLatitude()));
     }
 
-    private String getDatetime() {
-        Calendar mCalendar = new GregorianCalendar();
-        SimpleDateFormat dateFmt = new SimpleDateFormat("yyyy/MM/dd'T'HH:mm:ss", Locale.getDefault());
-        return dateFmt.format(mCalendar.getTime());
-    }
-
     @Override
     public void getSpeed(float myCurrentSpeed) {
         speed.setText(String.valueOf(round(myCurrentSpeed, 2)));
-    }
-
-    /**
-     * Round to certain number of decimals
-     *
-     * @param d            The number you want to round
-     * @param decimalPlace The number of decimal points
-     * @return The rounded number
-     */
-    public static float round(float d, int decimalPlace) {
-        BigDecimal bd = new BigDecimal(Float.toString(d));
-        bd = bd.setScale(decimalPlace, BigDecimal.ROUND_HALF_UP);
-        return bd.floatValue();
     }
 
     @Override
     public void onGpsNetworkStatusChanged(String status) {
         Snackbar.make(findViewById(R.id.login_coord_layout), status, Snackbar.LENGTH_LONG).show();
     }
-
 
     @Override
     public void getLocationAsynchronous(final Location location) {
@@ -227,12 +145,10 @@ public class MainActivity extends PermissionsManager implements GPSListener, Sen
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
     }
 
     @Override
     public void getAcceleration(double acceleration) {
-
     }
 
     @Override
@@ -301,6 +217,87 @@ public class MainActivity extends PermissionsManager implements GPSListener, Sen
                 selectSeconds.setText("");
             }
         }
+    }
+
+
+    private List<DataEntry<String>> getSpinnerItems() {
+        List<DataEntry<String>> items = new ArrayList<>();
+        items.add(new DataEntry<>(1, "Σχηματάρι"));
+        items.add(new DataEntry<>(2, "Χαλκίδα"));
+        items.add(new DataEntry<>(3, "Τέστ"));
+        return items;
+    }
+
+    private void setPermissions() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+            requestAppPermissions(permissions, R.string.permission, REQUEST_PERMISSION);
+    }
+
+    private void setUI() {
+        setContentView(R.layout.activity_main);
+        speed = findViewById(R.id.speedValue);
+        longitude = findViewById(R.id.longitudeValue);
+        latitude = findViewById(R.id.latitudeValue);
+        selectRoadSpinner = findViewById(R.id.road_spinner);
+        on_off_switch = findViewById(R.id.openGpsSwitch);
+        meters_seconds_switch = findViewById(R.id.meters_seconds_switch);
+        meters_seconds_switch.setOnCheckedChangeListener(this);
+        selectSeconds = findViewById(R.id.secondsEditText);
+        selectMeters = findViewById(R.id.metersEditText);
+        on_off_switch.setOnCheckedChangeListener(this);
+        selectRoadSpinner.setItems(getSpinnerItems());
+        selectMeters.setVisibility(View.GONE);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+    }
+
+    private void startGps(int milliSeconds, int meters) {
+        myGpsManager = GPSManager.getInstance(milliSeconds, meters);
+        myGpsManager.init(this, this);
+    }
+
+    private void stopGps() {
+        try {
+            if (myGpsManager != null)
+                myGpsManager.stopLocation();
+        } catch (NullPointerException ignore) {
+        }
+    }
+
+    private void startSensor() {
+        mySensorManager = MySensorManager.getInstance(this);
+        mySensorManager.setSensorListener(this);
+    }
+
+    private void stopSensor() {
+        mySensorManager.destroyInstance();
+    }
+
+    private void startInternetManager() {
+        internetConnectionManager = new InternetConnectionManager(this);
+        internetConnectionManager.setInternetListener(this);
+    }
+
+    private void stopInternetManager() {
+        internetConnectionManager = null;
+    }
+
+    private String getDatetime() {
+        Calendar mCalendar = new GregorianCalendar();
+        SimpleDateFormat dateFmt = new SimpleDateFormat("yyyy/MM/dd'T'HH:mm:ss", Locale.getDefault());
+        return dateFmt.format(mCalendar.getTime());
+    }
+
+    /**
+     * Round to certain number of decimals
+     *
+     * @param d            The number you want to round
+     * @param decimalPlace The number of decimal points
+     * @return The rounded number
+     */
+    public static float round(float d, int decimalPlace) {
+        BigDecimal bd = new BigDecimal(Float.toString(d));
+        bd = bd.setScale(decimalPlace, BigDecimal.ROUND_HALF_UP);
+        return bd.floatValue();
     }
 
     public void sendRecords(View view) {

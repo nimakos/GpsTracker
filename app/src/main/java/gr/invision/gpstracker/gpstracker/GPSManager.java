@@ -51,7 +51,7 @@ public class GPSManager implements GpsStatus.Listener, LocationListener {
      *
      * @return instance
      */
-    public static GPSManager getInstance(int minTime, int minDistance) {
+    public synchronized static GPSManager getInstance(int minTime, int minDistance) {
         if (mInstance == null) {
             mInstance = new GPSManager();
         }
