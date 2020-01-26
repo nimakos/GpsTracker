@@ -66,20 +66,59 @@ public class MyGPSManager implements GpsStatus.Listener, LocationListener {
         }
     }
 
-    private static int myMinTime;
-    private static int myMinDistance;
-    private boolean isGPSEnabled, isNetworkEnabled, passiveProvider;
-    private LocationManager locationManager;
+    //required parameters
     private GPSListener gpsListener;
     private WeakReference<Context> contextWeakReference;
+
+    //optional parameters
+    private long myMinTime;
+    private long myMinDistance;
+
+
+    private boolean isGPSEnabled, isNetworkEnabled, isPassiveProviderEnabled;
+    private LocationManager locationManager;
     private MyGPSModel myGPSModel;
     private static final float MPS_to_KPH = 3.6f;
 
     private static MyGPSManager INSTANCE;
 
-    private MyGPSManager(Context context, GPSListener gpsListener) {
-        contextWeakReference = new WeakReference<>(context);
-        this.gpsListener = gpsListener;
+    public static class Builder {
+
+        //required parameters
+        private GPSListener gpsListener;
+        private Context context;
+
+        //optional parameters
+        private long minimumTime = 1000;
+        private long minimumDistance = 0;
+
+        public Builder (Context context, GPSListener gpsListener) {
+            this.context = context;
+            this.gpsListener = gpsListener;
+        }
+
+        public Builder setMinimumDistance(long dinstance) {
+            this.minimumDistance = dinstance;
+
+            return this;
+        }
+
+        public Builder setMinimumTime(long time) {
+            this.minimumTime = time;
+
+            return this;
+        }
+
+        public MyGPSManager build() {
+            return getInstance(this);
+        }
+    }
+
+    private MyGPSManager(Builder builder) {
+        contextWeakReference = new WeakReference<>(builder.context);
+        this.gpsListener = builder.gpsListener;
+        this.myMinDistance = builder.minimumDistance;
+        this.myMinTime = builder.minimumTime;
         init();
     }
 
@@ -88,12 +127,10 @@ public class MyGPSManager implements GpsStatus.Listener, LocationListener {
      *
      * @return instance
      */
-    public synchronized static MyGPSManager getInstance(Context context, GPSListener gpsListener, int minTime, int minDistance) {
+    private synchronized static MyGPSManager getInstance(Builder builder) {
         if (INSTANCE == null) {
-            INSTANCE = new MyGPSManager(new WeakReference<>(context).get(), gpsListener);
+            INSTANCE = new MyGPSManager(builder);
         }
-        myMinTime = minTime;
-        myMinDistance = minDistance;
         return INSTANCE;
     }
 
@@ -121,7 +158,7 @@ public class MyGPSManager implements GpsStatus.Listener, LocationListener {
     private void checkIfNetworkOrGpsEnabled() {
         isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
         isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-        passiveProvider = locationManager.isProviderEnabled(LocationManager.PASSIVE_PROVIDER);
+        isPassiveProviderEnabled = locationManager.isProviderEnabled(LocationManager.PASSIVE_PROVIDER);
     }
 
 
@@ -136,12 +173,14 @@ public class MyGPSManager implements GpsStatus.Listener, LocationListener {
         GpsStatus gpsStatus;
         List<String> providers = locationManager.getProviders(true);
         Location bestLocation = null;
+        float bestAccuracy = Float.MAX_VALUE;
         for (String provider : providers) {
             Location location = locationManager.getLastKnownLocation(provider);
             if (location == null) {
                 continue;
             }
-            if (bestLocation == null || location.getAccuracy() < bestLocation.getAccuracy()) {
+            if (location.getAccuracy() < bestAccuracy) { //smaller accuracy the better
+                bestAccuracy = location.getAccuracy();
                 bestLocation = location;
             }
         }
@@ -263,10 +302,16 @@ public class MyGPSManager implements GpsStatus.Listener, LocationListener {
         if (ActivityCompat.checkSelfPermission(contextWeakReference.get(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(contextWeakReference.get(), android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions((Activity) contextWeakReference.get(), new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 101);
         }
+        locationManager.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, myMinTime, myMinDistance, this);
         locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, myMinTime, myMinDistance, this);
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, myMinTime, myMinDistance, this);
 
         try {
+            if (isPassiveProviderEnabled) {
+                if (locationManager != null) {
+                    networkLocation = locationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);
+                }
+            }
             if (isNetworkEnabled) {
                 if (locationManager != null)
                     networkLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
@@ -275,7 +320,8 @@ public class MyGPSManager implements GpsStatus.Listener, LocationListener {
                 if (locationManager != null)
                     gpsLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
             }
-        } catch (Exception ignore) {
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
 
         if (gpsLocation != null && networkLocation != null) {

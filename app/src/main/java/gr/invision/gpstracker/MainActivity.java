@@ -250,7 +250,11 @@ public class MainActivity extends PermissionsManager implements MyGPSManager.GPS
     }
 
     private void startGps(int milliSeconds, int meters) {
-        myGpsManager = MyGPSManager.getInstance(this, this, milliSeconds, meters);
+        myGpsManager = new MyGPSManager
+                .Builder(this, this)
+                .setMinimumDistance(meters)
+                .setMinimumTime(milliSeconds)
+                .build();
     }
 
     private void stopGps() {
