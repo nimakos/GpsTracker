@@ -39,7 +39,7 @@ import gr.invision.gpstracker.sensortracker.MySensorManager;
 import gr.invision.gpstracker.spinner.DataEntry;
 import gr.invision.gpstracker.spinner.Spinner;
 
-public class MainActivity extends PermissionsManager implements MyGPSManager.GPSListener, MySensorManager.SensorListener, MyConnectionManager.InternetListener, CompoundButton.OnCheckedChangeListener, GoogleLocation.OnLocationUpdate {
+public class MainActivity extends PermissionsManager implements MyGPSManager.GPSListener, MySensorManager.SensorListener, MyConnectionManager.InternetListener, CompoundButton.OnCheckedChangeListener, GoogleLocation.OnLocationUpdateListener {
 
     Spinner selectRoadSpinner;
     private static final int REQUEST_PERMISSION = 10;
@@ -58,6 +58,7 @@ public class MainActivity extends PermissionsManager implements MyGPSManager.GPS
     GpsRecord gpsRecord;
     Switch on_off_switch, meters_seconds_switch;
     EditText selectSeconds, selectMeters;
+    GoogleLocation googleLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,7 +78,7 @@ public class MainActivity extends PermissionsManager implements MyGPSManager.GPS
         startInternetManager();
         startSensor();
         Constructor.createDatafilesOut();
-        //new GoogleLocation(this).registerLocationListener(this);
+        googleLocation = GoogleLocation.getInstance(this, this);
     }
 
     @Override
@@ -93,6 +94,7 @@ public class MainActivity extends PermissionsManager implements MyGPSManager.GPS
         super.onDestroy();
         selectRoadSpinner.clear();
         AppDatabase.destroyInstance();
+        googleLocation.destroyInstance();
         stopSensor();
         stopInternetManager();
         System.gc();

@@ -101,8 +101,8 @@ public class MyGPSManager implements GpsStatus.Listener, LocationListener {
      * Όταν η εφαρμογή φύγει από το MainActivity π.χ. πάει στο παρασκήνιο
      */
     public void destroyInstance() {
-        gpsListener = null;
         locationManager.removeUpdates(this);
+        gpsListener = null;
         locationManager = null;
         INSTANCE = null;
     }

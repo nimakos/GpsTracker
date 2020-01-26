@@ -18,25 +18,39 @@ import java.lang.ref.WeakReference;
 
 public class GoogleLocation extends LocationCallback implements OnSuccessListener<Location>, LocationListener {
 
-    public interface OnLocationUpdate {
+    public interface OnLocationUpdateListener {
         void getGoogleLocationUpdate(Location location);
     }
 
-    private static final long UPDATE_INTERVAL = 15000;  /* 15 secs */
-    private static final long FASTEST_INTERVAL = 5000; /* 5 secs */
+    private static final long UPDATE_INTERVAL = 7000;
+    private static final long FASTEST_INTERVAL = 1000;
     private FusedLocationProviderClient fusedLocationProviderClient;
-    private OnLocationUpdate onLocationUpdate;
+    private OnLocationUpdateListener onLocationUpdateListener;
 
-    public GoogleLocation(Context context) {
+    private static GoogleLocation INSTANCE;
+
+    private GoogleLocation(Context context, OnLocationUpdateListener onLocationUpdateListener) {
         WeakReference<Context> contextWeakReference = new WeakReference<>(context);
+        this.onLocationUpdateListener = onLocationUpdateListener;
         init(contextWeakReference.get());
+    }
+
+    public synchronized static GoogleLocation getInstance(Context context, OnLocationUpdateListener onLocationUpdateListener) {
+        if (INSTANCE == null) {
+            INSTANCE = new GoogleLocation(new WeakReference<>(context).get(), onLocationUpdateListener);
+        }
+        return INSTANCE;
+    }
+
+    public void destroyInstance() {
+        fusedLocationProviderClient.removeLocationUpdates(this);
+        fusedLocationProviderClient = null;
+        onLocationUpdateListener = null;
+        INSTANCE = null;
     }
 
     @Override
     public void onSuccess(Location location) {
-        if (location != null) {
-            //Log.e("LAT - LONG", String.valueOf(location.getLongitude()) + location.getLatitude());
-        }
     }
 
     @Override
@@ -47,14 +61,10 @@ public class GoogleLocation extends LocationCallback implements OnSuccessListene
     @Override
     public void onLocationChanged(Location location) {
         if (location != null) {
-            onLocationUpdate.getGoogleLocationUpdate(location);
-            //Log.e("LAT - LONG", String.valueOf(location.getLongitude()) + location.getLatitude());
+            onLocationUpdateListener.getGoogleLocationUpdate(location);
         }
     }
 
-    public void registerLocationListener(OnLocationUpdate onLocationUpdate) {
-        this.onLocationUpdate = onLocationUpdate;
-    }
 
     private void init(Context context) {
         LocationRequest locationRequest = new LocationRequest();
@@ -73,9 +83,5 @@ public class GoogleLocation extends LocationCallback implements OnSuccessListene
         fusedLocationProviderClient.getLastLocation().addOnSuccessListener(this);
         fusedLocationProviderClient.flushLocations();
         fusedLocationProviderClient.requestLocationUpdates(locationRequest, this, Looper.myLooper());
-    }
-
-    public void stopLocationUpdates() {
-        fusedLocationProviderClient.removeLocationUpdates(this);
     }
 }
