@@ -22,22 +22,69 @@ public class GoogleLocation extends LocationCallback implements OnSuccessListene
         void getGoogleLocationUpdate(Location location);
     }
 
-    private static final long UPDATE_INTERVAL = 7000;
-    private static final long FASTEST_INTERVAL = 1000;
-    private FusedLocationProviderClient fusedLocationProviderClient;
+    //required parameters
     private OnLocationUpdateListener onLocationUpdateListener;
+
+    //optional parameters
+    private long UPDATE_INTERVAL;
+    private long FASTEST_INTERVAL;
+    private int PRIORITY;
+
+    private FusedLocationProviderClient fusedLocationProviderClient;
 
     private static GoogleLocation INSTANCE;
 
-    private GoogleLocation(Context context, OnLocationUpdateListener onLocationUpdateListener) {
-        WeakReference<Context> contextWeakReference = new WeakReference<>(context);
-        this.onLocationUpdateListener = onLocationUpdateListener;
+    public static class Builder {
+
+        //required parameters
+        private OnLocationUpdateListener onLocationUpdateListener;
+        private Context context;
+
+        //optional parameters
+        private int priority = LocationRequest.PRIORITY_HIGH_ACCURACY;
+        private long update_interval = 7000;
+        private long fastest_interval = 1000;
+
+        public Builder(Context context, OnLocationUpdateListener onLocationUpdateListener) {
+            this.context = context;
+            this.onLocationUpdateListener = onLocationUpdateListener;
+        }
+
+        public Builder setUpdateInterval(long update_interval) {
+            this.update_interval = update_interval;
+
+            return this;
+        }
+
+        public Builder setFastestInterval(long fastestInterval) {
+            this.fastest_interval = fastestInterval;
+
+            return this;
+        }
+
+        public Builder setPriority(int priority) {
+            this.priority = priority;
+
+            return this;
+        }
+
+        public GoogleLocation build() {
+            return getInstance(this);
+        }
+    }
+
+    private GoogleLocation(Builder builder) {
+        WeakReference<Context> contextWeakReference = new WeakReference<>(builder.context);
+        this.onLocationUpdateListener = builder.onLocationUpdateListener;
+        this.UPDATE_INTERVAL = builder.update_interval;
+        this.FASTEST_INTERVAL = builder.fastest_interval;
+        this.PRIORITY = builder.priority;
         init(contextWeakReference.get());
     }
 
-    public synchronized static GoogleLocation getInstance(Context context, OnLocationUpdateListener onLocationUpdateListener) {
+    private synchronized static GoogleLocation getInstance(Builder builder) {
         if (INSTANCE == null) {
-            INSTANCE = new GoogleLocation(new WeakReference<>(context).get(), onLocationUpdateListener);
+            INSTANCE = new GoogleLocation(builder);
         }
         return INSTANCE;
     }
@@ -68,7 +115,7 @@ public class GoogleLocation extends LocationCallback implements OnSuccessListene
 
     private void init(Context context) {
         LocationRequest locationRequest = new LocationRequest();
-        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        locationRequest.setPriority(PRIORITY);
         locationRequest.setInterval(UPDATE_INTERVAL);
         locationRequest.setFastestInterval(FASTEST_INTERVAL);
 

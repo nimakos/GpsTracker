@@ -8,6 +8,8 @@ import android.hardware.SensorEvent;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
+
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.material.snackbar.Snackbar;
 import android.view.View;
 import android.view.WindowManager;
@@ -31,7 +33,7 @@ import gr.invision.gpstracker.build.Constructor;
 import gr.invision.gpstracker.db.DatabaseInitializer;
 import gr.invision.gpstracker.db.databaseHolder.AppDatabase;
 import gr.invision.gpstracker.db.entity.GpsRecord;
-import gr.invision.gpstracker.gpstracker.customapi.MyGPSManager;
+import gr.invision.gpstracker.gpstracker.androidapi.MyGPSManager;
 import gr.invision.gpstracker.gpstracker.googleapi.GoogleLocation;
 import gr.invision.gpstracker.internettracker.MyConnectionManager;
 import gr.invision.gpstracker.permissions.PermissionsManager;
@@ -78,7 +80,7 @@ public class MainActivity extends PermissionsManager implements MyGPSManager.GPS
         startInternetManager();
         startSensor();
         Constructor.createDatafilesOut();
-        googleLocation = GoogleLocation.getInstance(this, this);
+        startGoogleGps();
     }
 
     @Override
@@ -94,7 +96,7 @@ public class MainActivity extends PermissionsManager implements MyGPSManager.GPS
         super.onDestroy();
         selectRoadSpinner.clear();
         AppDatabase.destroyInstance();
-        googleLocation.destroyInstance();
+        stopGoogleGps();
         stopSensor();
         stopInternetManager();
         System.gc();
@@ -255,6 +257,19 @@ public class MainActivity extends PermissionsManager implements MyGPSManager.GPS
         myGpsManager.destroyInstance();
     }
 
+    private void startGoogleGps() {
+        googleLocation = new GoogleLocation
+                .Builder(this, this)
+                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+                .setFastestInterval(17000)
+                .setUpdateInterval(11000)
+                .build();
+    }
+
+    private void stopGoogleGps() {
+        googleLocation.destroyInstance();
+    }
+
     private void startSensor() {
         mySensorManager = MySensorManager.getInstance(this, this);
     }
@@ -308,7 +323,6 @@ public class MainActivity extends PermissionsManager implements MyGPSManager.GPS
                         displayToastMessage("Οι εγγραφές διεγράφησαν");
                         break;
                     case DialogInterface.BUTTON_NEGATIVE:
-                        break;
                 }
             } else {
                 displayToastMessage("Παρακαλώ επιλέξτε πρώτα την κατεύθυνση");

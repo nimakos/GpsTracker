@@ -1,4 +1,4 @@
-package gr.invision.gpstracker.gpstracker.customapi;
+package gr.invision.gpstracker.gpstracker.androidapi;
 
 import android.Manifest;
 import android.app.Activity;
@@ -34,8 +34,11 @@ public class MyGPSManager implements GpsStatus.Listener, LocationListener {
      */
     public interface GPSListener {
         void getLocationUpdate(Location location);
+
         void getSpeedUpdate(float speed);
+
         void onGpsNetworkStatusUpdate(String status);
+
         void getLocationAsynchronousUpdate(Location location);
     }
 
@@ -201,9 +204,9 @@ public class MyGPSManager implements GpsStatus.Listener, LocationListener {
 
     @Override
     public void onProviderDisabled(String provider) {
-        if (provider.equals("gps") && !isGPSEnabled)
+        if (provider.equals("gps"))
             showSettingsAlert(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-        if (provider.equals("network") && !isNetworkEnabled && isGPSEnabled)
+        if (provider.equals("network"))
             showSettingsAlert(Settings.ACTION_NETWORK_OPERATOR_SETTINGS);
     }
 
@@ -212,8 +215,13 @@ public class MyGPSManager implements GpsStatus.Listener, LocationListener {
      */
     private void showSettingsAlert(String settings) {
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(contextWeakReference.get());
-        alertDialog.setTitle("GPS Settings");
-        alertDialog.setMessage("GPS is not enabled. Do you want to enable it?");
+        alertDialog.setTitle("Settings");
+        if (settings.contains("NETWORK")) {
+            alertDialog.setMessage("Mobile data are not enabled. Do you want to enable it?");
+        } else {
+            alertDialog.setMessage("GPS is not enabled. Do you want to enable it?");
+
+        }
         alertDialog.setPositiveButton("Settings", (dialog, which) -> {
             Intent intent = new Intent(settings);
             contextWeakReference.get().startActivity(intent);

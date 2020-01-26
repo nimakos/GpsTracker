@@ -41,29 +41,37 @@ public class MyConnectionManager {
     /**
      * Check if there is any connectivity
      */
-    private void isConnected() {
-        listener.checkConnection(info != null && info.isConnected());
+    public boolean isConnected() {
+        boolean isConnected = info != null && info.isConnected();
+        listener.checkConnection(isConnected);
+        return isConnected;
     }
 
     /**
      * Check if there is any connectivity to a Wifi network
      */
-    private void isConnectedWifi() {
-        listener.checkWifiConnection(info != null && info.isConnected() && info.getType() == ConnectivityManager.TYPE_WIFI);
+    public boolean isConnectedWifi() {
+        boolean isConnectedWifi = info != null && info.isConnected() && info.getType() == ConnectivityManager.TYPE_WIFI;
+        listener.checkWifiConnection(isConnectedWifi);
+        return isConnectedWifi;
     }
 
     /**
      * Check if there is any connectivity to a mobile network
      */
-    private void isConnectedMobile() {
-        listener.checkMobileConnection(info != null && info.isConnected() && info.getType() == ConnectivityManager.TYPE_MOBILE);
+    public boolean isConnectedMobile() {
+        boolean isConnectedMobile = info != null && info.isConnected() && info.getType() == ConnectivityManager.TYPE_MOBILE;
+        listener.checkMobileConnection(isConnectedMobile);
+        return isConnectedMobile;
     }
 
     /**
      * Check if there is fast connectivity
      */
-    private void isConnectedFast() {
-        listener.checkSpeedConnection(info != null && info.isConnected() && isConnectionFast(info.getType(), info.getSubtype()));
+    public boolean isConnectedFast() {
+        boolean isConnectedFast = info != null && info.isConnected() && isConnectionFast(info.getType(), info.getSubtype());
+        listener.checkSpeedConnection(isConnectedFast);
+        return isConnectedFast;
     }
 
     /**
