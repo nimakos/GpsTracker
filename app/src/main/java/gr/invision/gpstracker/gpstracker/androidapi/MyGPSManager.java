@@ -24,8 +24,12 @@ import java.util.Objects;
 
 /**
  * Check device's GPS settings and select the best provider
- * Call from main like:  MyGPSManager gpsManager = MyGPSManager.getInstance(this);
- * along with:           gpsManager.init(this, this);
+ * Call from activity like:
+ *     myGpsManager = new MyGPSManager
+ *                 .Builder(this, this)
+ *                 .setMinimumDistance(meters)
+ *                 .setMinimumTime(milliSeconds)
+ *                 .build();
  */
 public class MyGPSManager implements GpsStatus.Listener, LocationListener {
 
@@ -92,6 +96,12 @@ public class MyGPSManager implements GpsStatus.Listener, LocationListener {
         private long minimumTime = 1000;
         private long minimumDistance = 0;
 
+        /**
+         * The Builder constructor
+         *
+         * @param context                  The Activity context
+         * @param gpsListener The Observer location listener
+         */
         public Builder (Context context, GPSListener gpsListener) {
             this.context = context;
             this.gpsListener = gpsListener;
@@ -114,6 +124,11 @@ public class MyGPSManager implements GpsStatus.Listener, LocationListener {
         }
     }
 
+    /**
+     * The private main class constructor
+     *
+     * @param builder The builder class
+     */
     private MyGPSManager(Builder builder) {
         contextWeakReference = new WeakReference<>(builder.context);
         this.gpsListener = builder.gpsListener;
@@ -123,9 +138,10 @@ public class MyGPSManager implements GpsStatus.Listener, LocationListener {
     }
 
     /**
-     * Static accessor (Singleton pattern)
+     * Singleton pattern. This constructor creates only one instance
      *
-     * @return instance
+     * @param builder The Builder class
+     * @return This single instance
      */
     private synchronized static MyGPSManager getInstance(Builder builder) {
         if (INSTANCE == null) {
@@ -135,7 +151,7 @@ public class MyGPSManager implements GpsStatus.Listener, LocationListener {
     }
 
     /**
-     * Όταν η εφαρμογή φύγει από το MainActivity π.χ. πάει στο παρασκήνιο
+     * This destructor destroys all instances and removes location updates
      */
     public void destroyInstance() {
         locationManager.removeUpdates(this);
@@ -262,7 +278,7 @@ public class MyGPSManager implements GpsStatus.Listener, LocationListener {
     }
 
     /**
-     * Μεταβαση στο μενου για χειροκίνητο ανοιγμα από τον χρήστη
+     * Go to menu to open Gps or network
      */
     private void showSettingsAlert(String settings) {
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(contextWeakReference.get());
@@ -271,7 +287,6 @@ public class MyGPSManager implements GpsStatus.Listener, LocationListener {
             alertDialog.setMessage("Mobile data are not enabled. Do you want to enable it?");
         } else {
             alertDialog.setMessage("GPS is not enabled. Do you want to enable it?");
-
         }
         alertDialog.setPositiveButton("Settings", (dialog, which) -> {
             Intent intent = new Intent(settings);

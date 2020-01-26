@@ -132,7 +132,7 @@ public class MainActivity extends PermissionsManager implements MyGPSManager.GPS
 
     @Override
     public void onGpsNetworkStatusUpdate(String status) {
-        Snackbar.make(findViewById(R.id.login_coord_layout), status, Snackbar.LENGTH_LONG).show();
+        Snackbar.make(findViewById(android.R.id.content), status, Snackbar.LENGTH_LONG).show();
     }
 
     @Override

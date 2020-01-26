@@ -45,6 +45,12 @@ public class GoogleLocation extends LocationCallback implements OnSuccessListene
         private long update_interval = 7000;
         private long fastest_interval = 1000;
 
+        /**
+         * The Builder constructor
+         *
+         * @param context                  The Activity context
+         * @param onLocationUpdateListener The Observer location listener
+         */
         public Builder(Context context, OnLocationUpdateListener onLocationUpdateListener) {
             this.context = context;
             this.onLocationUpdateListener = onLocationUpdateListener;
@@ -73,6 +79,11 @@ public class GoogleLocation extends LocationCallback implements OnSuccessListene
         }
     }
 
+    /**
+     * The private main class constructor
+     *
+     * @param builder The builder class
+     */
     private GoogleLocation(Builder builder) {
         WeakReference<Context> contextWeakReference = new WeakReference<>(builder.context);
         this.onLocationUpdateListener = builder.onLocationUpdateListener;
@@ -82,6 +93,12 @@ public class GoogleLocation extends LocationCallback implements OnSuccessListene
         init(contextWeakReference.get());
     }
 
+    /**
+     * Singleton pattern. This constructor creates only one instance
+     *
+     * @param builder The Builder class
+     * @return This single instance
+     */
     private synchronized static GoogleLocation getInstance(Builder builder) {
         if (INSTANCE == null) {
             INSTANCE = new GoogleLocation(builder);
@@ -89,6 +106,9 @@ public class GoogleLocation extends LocationCallback implements OnSuccessListene
         return INSTANCE;
     }
 
+    /**
+     * This destructor destroys all instances and removes location updates
+     */
     public void destroyInstance() {
         fusedLocationProviderClient.removeLocationUpdates(this);
         fusedLocationProviderClient = null;
