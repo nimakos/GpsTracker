@@ -31,8 +31,7 @@ import gr.invision.gpstracker.build.Constructor;
 import gr.invision.gpstracker.db.DatabaseInitializer;
 import gr.invision.gpstracker.db.databaseHolder.AppDatabase;
 import gr.invision.gpstracker.db.entity.GpsRecord;
-import gr.invision.gpstracker.gpstracker.GPSListener;
-import gr.invision.gpstracker.gpstracker.MyGPSManager;
+import gr.invision.gpstracker.gpstracker.customapi.MyGPSManager;
 import gr.invision.gpstracker.gpstracker.googleapi.GoogleLocation;
 import gr.invision.gpstracker.internettracker.MyConnectionManager;
 import gr.invision.gpstracker.permissions.PermissionsManager;
@@ -40,7 +39,7 @@ import gr.invision.gpstracker.sensortracker.MySensorManager;
 import gr.invision.gpstracker.spinner.DataEntry;
 import gr.invision.gpstracker.spinner.Spinner;
 
-public class MainActivity extends PermissionsManager implements GPSListener, MySensorManager.SensorListener, MyConnectionManager.InternetListener, CompoundButton.OnCheckedChangeListener, GoogleLocation.OnLocationUpdate {
+public class MainActivity extends PermissionsManager implements MyGPSManager.GPSListener, MySensorManager.SensorListener, MyConnectionManager.InternetListener, CompoundButton.OnCheckedChangeListener, GoogleLocation.OnLocationUpdate {
 
     Spinner selectRoadSpinner;
     private static final int REQUEST_PERMISSION = 10;
@@ -106,7 +105,7 @@ public class MainActivity extends PermissionsManager implements GPSListener, MyS
     }
 
     @Override
-    public void getLocation(Location location) {
+    public void getLocationUpdate(Location location) {
         gpsRecord = new GpsRecord();
         gpsRecord.setLatitude(location.getLatitude());
         gpsRecord.setLongitude(location.getLongitude());
@@ -118,22 +117,22 @@ public class MainActivity extends PermissionsManager implements GPSListener, MyS
         gpsRecord.setRoad(selectRoadSpinner.getSelectedItem().id);
         DatabaseInitializer.insertGpsRecord(AppDatabase.getAppDatabase(this), gpsRecord);
 
-        longitude.setText(String.valueOf(location.getLongitude()));
-        latitude.setText(String.valueOf(location.getLatitude()));
+        longitude.setText(String.valueOf(round((float)location.getLongitude(), 4)));
+        latitude.setText(String.valueOf(round((float)location.getLatitude(), 4)));
     }
 
     @Override
-    public void getSpeed(float myCurrentSpeed) {
+    public void getSpeedUpdate(float myCurrentSpeed) {
         speed.setText(String.valueOf(round(myCurrentSpeed, 2)));
     }
 
     @Override
-    public void onGpsNetworkStatusChanged(String status) {
+    public void onGpsNetworkStatusUpdate(String status) {
         Snackbar.make(findViewById(R.id.login_coord_layout), status, Snackbar.LENGTH_LONG).show();
     }
 
     @Override
-    public void getLocationAsynchronous(final Location location) {
+    public void getLocationAsynchronousUpdate(final Location location) {
         /*runOnUiThread(() -> {
             longitude.setText(String.valueOf(location.getLongitude()));
             latitude.setText(String.valueOf(location.getLatitude()));
@@ -158,22 +157,18 @@ public class MainActivity extends PermissionsManager implements GPSListener, MyS
 
     @Override
     public void checkConnection(boolean isConnected) {
-
     }
 
     @Override
     public void checkWifiConnection(boolean isConnected) {
-        System.out.println();
     }
 
     @Override
     public void checkMobileConnection(boolean isConnected) {
-        System.out.println();
     }
 
     @Override
     public void checkSpeedConnection(boolean isConnectedFast) {
-        System.out.println();
     }
 
     @Override

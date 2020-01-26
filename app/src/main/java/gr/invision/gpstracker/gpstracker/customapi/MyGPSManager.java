@@ -1,4 +1,4 @@
-package gr.invision.gpstracker.gpstracker;
+package gr.invision.gpstracker.gpstracker.customapi;
 
 import android.Manifest;
 import android.app.Activity;
@@ -29,6 +29,43 @@ import java.util.Objects;
  */
 public class MyGPSManager implements GpsStatus.Listener, LocationListener {
 
+    /**
+     * Callback interface to receive GPS updates from MyGPSManager.
+     */
+    public interface GPSListener {
+        void getLocationUpdate(Location location);
+        void getSpeedUpdate(float speed);
+        void onGpsNetworkStatusUpdate(String status);
+        void getLocationAsynchronousUpdate(Location location);
+    }
+
+    public enum GpsStatus {
+        FAILED,
+        GPS_STARTED,
+        NETWORK_STARTED,
+    }
+
+    /**
+     * Helper class
+     */
+    public static class MyGPSModel {
+        private Location location;
+        private GpsStatus gpsStatus;
+
+        MyGPSModel(Location location, GpsStatus gpsStatus) {
+            this.location = location;
+            this.gpsStatus = gpsStatus;
+        }
+
+        Location getLocation() {
+            return location;
+        }
+
+        GpsStatus getGpsStatus() {
+            return gpsStatus;
+        }
+    }
+
     private static int myMinTime;
     private static int myMinDistance;
     private boolean isGPSEnabled, isNetworkEnabled;
@@ -38,14 +75,7 @@ public class MyGPSManager implements GpsStatus.Listener, LocationListener {
     private MyGPSModel myGPSModel;
     private static final float MPS_to_KPH = 3.6f;
 
-    // Instance
     private static MyGPSManager INSTANCE;
-
-    public enum GpsStatus {
-        FAILED,
-        GPS_STARTED,
-        NETWORK_STARTED,
-    }
 
     private MyGPSManager(Context context, GPSListener gpsListener) {
         contextWeakReference = new WeakReference<>(context);
@@ -130,13 +160,13 @@ public class MyGPSManager implements GpsStatus.Listener, LocationListener {
     private void promptGpsEnable() {
         switch (myGPSModel.getGpsStatus()) {
             case FAILED:
-                gpsListener.onGpsNetworkStatusChanged("Something went wrong...");
+                gpsListener.onGpsNetworkStatusUpdate("Something went wrong...");
                 break;
             case GPS_STARTED:
-                gpsListener.onGpsNetworkStatusChanged("Gps Location Started");
+                gpsListener.onGpsNetworkStatusUpdate("Gps Location Started");
                 break;
             case NETWORK_STARTED:
-                gpsListener.onGpsNetworkStatusChanged("Network Location Started");
+                gpsListener.onGpsNetworkStatusUpdate("Network Location Started");
                 break;
         }
     }
@@ -162,10 +192,10 @@ public class MyGPSManager implements GpsStatus.Listener, LocationListener {
     @Override
     public void onLocationChanged(Location location) {
         if (location != null) {
-            gpsListener.getLocation(location);
-            gpsListener.getSpeed(location.getSpeed() * MPS_to_KPH);
+            gpsListener.getLocationUpdate(location);
+            gpsListener.getSpeedUpdate(location.getSpeed() * MPS_to_KPH);
         } else {
-            gpsListener.getSpeed(0.0f);
+            gpsListener.getSpeedUpdate(0.0f);
         }
     }
 
@@ -207,7 +237,7 @@ public class MyGPSManager implements GpsStatus.Listener, LocationListener {
      * Παίρνει την τρέχουσα τοποθεσία είτε μέσω Network είτε μέσω GPS για κάθε περίπτωση
      */
     private MyGPSModel getLastKnownLocationTest() {
-        Location networkLocation = null, GpsLocation = null, finalLocation = null;
+        Location networkLocation = null, gpsLocation = null, finalLocation = null;
         GpsStatus gpsStatus;
 
         if (ActivityCompat.checkSelfPermission(contextWeakReference.get(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(contextWeakReference.get(), android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -223,23 +253,23 @@ public class MyGPSManager implements GpsStatus.Listener, LocationListener {
             }
             if (isGPSEnabled) {
                 if (locationManager != null)
-                    GpsLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                    gpsLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
             }
         } catch (Exception ignore) {
         }
 
-        if (GpsLocation != null && networkLocation != null) {
+        if (gpsLocation != null && networkLocation != null) {
             //smaller the number more accurate result will
-            if (GpsLocation.getAccuracy() > networkLocation.getAccuracy()) {
+            if (gpsLocation.getAccuracy() > networkLocation.getAccuracy()) {
                 finalLocation = networkLocation;
                 gpsStatus = GpsStatus.NETWORK_STARTED;
             } else {
-                finalLocation = GpsLocation;
+                finalLocation = gpsLocation;
                 gpsStatus = GpsStatus.GPS_STARTED;
             }
         } else {
-            if (GpsLocation != null) {
-                finalLocation = GpsLocation;
+            if (gpsLocation != null) {
+                finalLocation = gpsLocation;
                 gpsStatus = GpsStatus.GPS_STARTED;
             } else if (networkLocation != null) {
                 finalLocation = networkLocation;
@@ -289,7 +319,7 @@ public class MyGPSManager implements GpsStatus.Listener, LocationListener {
             while (true) {
                 Location location = getLastKnownLocationTest().getLocation();
                 if (location != null) {
-                    gpsListener.getLocationAsynchronous(location);
+                    gpsListener.getLocationAsynchronousUpdate(location);
                 }
                 try {
                     Thread.sleep(1000);
