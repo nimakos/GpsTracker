@@ -34,11 +34,8 @@ public class MyGPSManager implements GpsStatus.Listener, LocationListener {
      */
     public interface GPSListener {
         void getLocationUpdate(Location location);
-
         void getSpeedUpdate(float speed);
-
         void onGpsNetworkStatusUpdate(String status);
-
         void getLocationAsynchronousUpdate(Location location);
     }
 
@@ -71,7 +68,7 @@ public class MyGPSManager implements GpsStatus.Listener, LocationListener {
 
     private static int myMinTime;
     private static int myMinDistance;
-    private boolean isGPSEnabled, isNetworkEnabled;
+    private boolean isGPSEnabled, isNetworkEnabled, passiveProvider;
     private LocationManager locationManager;
     private GPSListener gpsListener;
     private WeakReference<Context> contextWeakReference;
@@ -124,6 +121,7 @@ public class MyGPSManager implements GpsStatus.Listener, LocationListener {
     private void checkIfNetworkOrGpsEnabled() {
         isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
         isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+        passiveProvider = locationManager.isProviderEnabled(LocationManager.PASSIVE_PROVIDER);
     }
 
 
@@ -131,6 +129,7 @@ public class MyGPSManager implements GpsStatus.Listener, LocationListener {
         if (ActivityCompat.checkSelfPermission(contextWeakReference.get(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(contextWeakReference.get(), android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions((Activity) contextWeakReference.get(), new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 101);
         }
+        locationManager.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, myMinTime, myMinDistance, this);
         locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, myMinTime, myMinDistance, this);
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, myMinTime, myMinDistance, this);
 
@@ -150,12 +149,20 @@ public class MyGPSManager implements GpsStatus.Listener, LocationListener {
             gpsStatus = GpsStatus.FAILED;
             myGPSModel = new MyGPSModel(null, gpsStatus);
         } else {
-            if (bestLocation.getProvider().equals("gps")) {
-                gpsStatus = GpsStatus.GPS_STARTED;
-                myGPSModel = new MyGPSModel(bestLocation, gpsStatus);
-            } else {
-                gpsStatus = GpsStatus.NETWORK_STARTED;
-                myGPSModel = new MyGPSModel(bestLocation, gpsStatus);
+            switch (bestLocation.getProvider()) {
+                case "gps":
+                    gpsStatus = GpsStatus.GPS_STARTED;
+                    myGPSModel = new MyGPSModel(bestLocation, gpsStatus);
+                    break;
+                case "passive":
+                case "network":
+                    gpsStatus = GpsStatus.NETWORK_STARTED;
+                    myGPSModel = new MyGPSModel(bestLocation, gpsStatus);
+                    break;
+                default:
+                    gpsStatus = GpsStatus.FAILED;
+                    myGPSModel = new MyGPSModel(null, gpsStatus);
+                    break;
             }
         }
     }
@@ -204,10 +211,15 @@ public class MyGPSManager implements GpsStatus.Listener, LocationListener {
 
     @Override
     public void onProviderDisabled(String provider) {
-        if (provider.equals("gps"))
-            showSettingsAlert(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-        if (provider.equals("network"))
-            showSettingsAlert(Settings.ACTION_NETWORK_OPERATOR_SETTINGS);
+        switch (provider) {
+            case "gps":
+                showSettingsAlert(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                break;
+            case "network":
+            case "passive":
+                showSettingsAlert(Settings.ACTION_NETWORK_OPERATOR_SETTINGS);
+                break;
+        }
     }
 
     /**
