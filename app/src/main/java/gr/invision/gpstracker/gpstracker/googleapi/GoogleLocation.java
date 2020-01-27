@@ -122,7 +122,8 @@ public class GoogleLocation extends LocationCallback implements OnSuccessListene
      * This destructor destroys all instances and removes location updates
      */
     public void destroyInstance() {
-        fusedLocationProviderClient.removeLocationUpdates(this);
+        if (fusedLocationProviderClient != null)
+            fusedLocationProviderClient.removeLocationUpdates(this);
         fusedLocationProviderClient = null;
         onLocationUpdateListener = null;
         INSTANCE = null;
@@ -130,6 +131,7 @@ public class GoogleLocation extends LocationCallback implements OnSuccessListene
 
     @Override
     public void onSuccess(Location location) {
+        onLocationChanged(location);
     }
 
     @Override
@@ -139,9 +141,9 @@ public class GoogleLocation extends LocationCallback implements OnSuccessListene
 
     @Override
     public void onLocationChanged(Location location) {
-        if (location != null) {
-            onLocationUpdateListener.getGoogleLocationUpdate(location);
-        }
+        if (location != null)
+            if (onLocationUpdateListener != null)
+                onLocationUpdateListener.getGoogleLocationUpdate(location);
     }
 
     /**
@@ -158,6 +160,10 @@ public class GoogleLocation extends LocationCallback implements OnSuccessListene
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder();
         builder.addLocationRequest(locationRequest);
         LocationSettingsRequest locationSettingsRequest = builder.build();
+
+        //**************************
+        builder.setAlwaysShow(true); //this is the key ingredient
+        //**************************
 
         SettingsClient settingsClient = LocationServices.getSettingsClient(context);
         settingsClient.checkLocationSettings(locationSettingsRequest);
