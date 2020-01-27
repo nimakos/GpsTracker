@@ -25,11 +25,11 @@ import java.util.Objects;
 /**
  * Checking device's GPS settings and select the best provider
  * Call from activity like:
- *     myGpsManager = new MyGPSManager
- *                 .Builder(this, this)
- *                 .setMinimumDistance(meters)
- *                 .setMinimumTime(milliSeconds)
- *                 .build();
+ * myGpsManager = new MyGPSManager
+ * .Builder(this, this)
+ * .setMinimumDistance(meters)
+ * .setMinimumTime(milliSeconds)
+ * .build();
  */
 public class MyGPSManager implements GpsStatus.Listener, LocationListener {
 
@@ -38,8 +38,11 @@ public class MyGPSManager implements GpsStatus.Listener, LocationListener {
      */
     public interface GPSListener {
         void getLocationUpdate(Location location);
+
         void getSpeedUpdate(float speed);
+
         void onGpsNetworkStatusUpdate(String status);
+
         void getLocationAsynchronousUpdate(Location location);
     }
 
@@ -97,10 +100,10 @@ public class MyGPSManager implements GpsStatus.Listener, LocationListener {
         /**
          * The Builder constructor
          *
-         * @param context                  The Activity context
+         * @param context     The Activity context
          * @param gpsListener The Observer location listener
          */
-        public Builder (Context context, GPSListener gpsListener) {
+        public Builder(Context context, GPSListener gpsListener) {
             this.context = context;
             this.gpsListener = gpsListener;
         }

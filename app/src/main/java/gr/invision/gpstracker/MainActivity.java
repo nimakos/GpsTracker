@@ -8,9 +8,6 @@ import android.hardware.SensorEvent;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
-
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.material.snackbar.Snackbar;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.CompoundButton;
@@ -18,6 +15,9 @@ import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
@@ -121,8 +121,8 @@ public class MainActivity extends PermissionsManager implements MyGPSManager.GPS
         gpsRecord.setRoad(selectRoadSpinner.getSelectedItem().id);
         DatabaseInitializer.insertGpsRecord(AppDatabase.getAppDatabase(this), gpsRecord);
 
-        longitude.setText(String.valueOf(round((float)location.getLongitude(), 4)));
-        latitude.setText(String.valueOf(round((float)location.getLatitude(), 4)));
+        longitude.setText(String.valueOf(round((float) location.getLongitude(), 4)));
+        latitude.setText(String.valueOf(round((float) location.getLatitude(), 4)));
     }
 
     @Override
