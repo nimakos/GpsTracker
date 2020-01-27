@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Check device's GPS settings and select the best provider
+ * Checking device's GPS settings and select the best provider
  * Call from activity like:
  *     myGpsManager = new MyGPSManager
  *                 .Builder(this, this)
@@ -78,12 +78,10 @@ public class MyGPSManager implements GpsStatus.Listener, LocationListener {
     private long myMinTime;
     private long myMinDistance;
 
-
     private boolean isGPSEnabled, isNetworkEnabled, isPassiveProviderEnabled;
     private LocationManager locationManager;
     private MyGPSModel myGPSModel;
     private static final float MPS_to_KPH = 3.6f;
-
     private static MyGPSManager INSTANCE;
 
     public static class Builder {
@@ -160,6 +158,9 @@ public class MyGPSManager implements GpsStatus.Listener, LocationListener {
         INSTANCE = null;
     }
 
+    /**
+     * initialize provider
+     */
     private void init() {
         initLocationManager();
         checkIfNetworkOrGpsEnabled();
@@ -176,7 +177,6 @@ public class MyGPSManager implements GpsStatus.Listener, LocationListener {
         isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
         isPassiveProviderEnabled = locationManager.isProviderEnabled(LocationManager.PASSIVE_PROVIDER);
     }
-
 
     private void getLastKnownLocation() {
         if (ActivityCompat.checkSelfPermission(contextWeakReference.get(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(contextWeakReference.get(), android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -303,7 +303,6 @@ public class MyGPSManager implements GpsStatus.Listener, LocationListener {
     @Override
     public void onProviderEnabled(String provider) {
     }
-
 
     // ============================= Un-used methods ==================================
 

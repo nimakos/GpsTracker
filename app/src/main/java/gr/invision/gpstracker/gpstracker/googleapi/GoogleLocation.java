@@ -16,8 +16,21 @@ import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.lang.ref.WeakReference;
 
+/**
+ * Checking device's GPS settings and select the best provider
+ * Call from activity like:
+ * googleLocation = new GoogleLocation
+ * .Builder(this, this)
+ * .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+ * .setFastestInterval(17000)
+ * .setUpdateInterval(11000)
+ * .build();
+ */
 public class GoogleLocation extends LocationCallback implements OnSuccessListener<Location>, LocationListener {
 
+    /**
+     * Callback interface to receive GPS updates from MyGPSManager.
+     */
     public interface OnLocationUpdateListener {
         void getGoogleLocationUpdate(Location location);
     }
@@ -31,7 +44,6 @@ public class GoogleLocation extends LocationCallback implements OnSuccessListene
     private int PRIORITY;
 
     private FusedLocationProviderClient fusedLocationProviderClient;
-
     private static GoogleLocation INSTANCE;
 
     public static class Builder {
@@ -132,7 +144,11 @@ public class GoogleLocation extends LocationCallback implements OnSuccessListene
         }
     }
 
-
+    /**
+     * initialize provider
+     *
+     * @param context The activity context
+     */
     private void init(Context context) {
         LocationRequest locationRequest = new LocationRequest();
         locationRequest.setPriority(PRIORITY);
