@@ -136,14 +136,19 @@ public class GoogleLocation extends LocationCallback implements OnSuccessListene
 
     @Override
     public void onLocationResult(LocationResult locationResult) {
-        onLocationChanged(locationResult.getLastLocation());
+       // onLocationChanged(locationResult.getLastLocation());
+        for (Location location : locationResult.getLocations()) {
+            if (location != null) {
+                onLocationUpdateListener.getGoogleLocationUpdate(location);
+            }
+        }
     }
 
     @Override
     public void onLocationChanged(Location location) {
-        if (location != null)
+       /* if (location != null)
             if (onLocationUpdateListener != null)
-                onLocationUpdateListener.getGoogleLocationUpdate(location);
+                onLocationUpdateListener.getGoogleLocationUpdate(location);*/
     }
 
     /**
