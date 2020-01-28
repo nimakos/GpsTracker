@@ -266,7 +266,7 @@ public class MainActivity extends PermissionsManager implements MyGPSManager.GPS
                 .Builder(this, this)
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
                 .setFastestInterval(1000)
-                .setUpdateInterval(11000)
+                .setUpdateInterval(10000)
                 .build();
     }
 
