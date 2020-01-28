@@ -149,7 +149,6 @@ public class GoogleLocation extends LocationCallback implements OnSuccessListene
        /* if (location != null)
             if (onLocationUpdateListener != null)
                 onLocationUpdateListener.getGoogleLocationUpdate(location);*/
-       //sad
     }
 
     /**
