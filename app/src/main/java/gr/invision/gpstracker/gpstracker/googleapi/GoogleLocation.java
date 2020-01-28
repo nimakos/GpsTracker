@@ -33,6 +33,8 @@ public class GoogleLocation extends LocationCallback implements OnSuccessListene
      */
     public interface OnLocationUpdateListener {
         void getGoogleLocationUpdate(Location location);
+
+        void getSpeedUpdate(float speed);
     }
 
     //required parameters
@@ -44,6 +46,7 @@ public class GoogleLocation extends LocationCallback implements OnSuccessListene
     private int PRIORITY;
 
     private FusedLocationProviderClient fusedLocationProviderClient;
+    private static final float MPS_to_KPH = 3.6f;
     private static GoogleLocation INSTANCE;
 
     public static class Builder {
@@ -54,7 +57,7 @@ public class GoogleLocation extends LocationCallback implements OnSuccessListene
 
         //optional parameters
         private int priority = LocationRequest.PRIORITY_HIGH_ACCURACY;
-        private long update_interval = 7000;
+        private long update_interval = 1000 * 2 ;
         private long fastest_interval = 1000;
 
         /**
@@ -136,16 +139,20 @@ public class GoogleLocation extends LocationCallback implements OnSuccessListene
 
     @Override
     public void onLocationResult(LocationResult locationResult) {
-       // onLocationChanged(locationResult.getLastLocation());
+        //onLocationChanged(locationResult.getLastLocation());
         for (Location location : locationResult.getLocations()) {
             if (location != null) {
                 onLocationUpdateListener.getGoogleLocationUpdate(location);
+                onLocationUpdateListener.getSpeedUpdate(location.getSpeed() * MPS_to_KPH);
+            } else {
+                onLocationUpdateListener.getSpeedUpdate(0.0f);
             }
         }
     }
 
     @Override
     public void onLocationChanged(Location location) {
+        System.out.println(location);
        /* if (location != null)
             if (onLocationUpdateListener != null)
                 onLocationUpdateListener.getGoogleLocationUpdate(location);*/

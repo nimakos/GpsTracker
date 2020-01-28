@@ -80,7 +80,7 @@ public class MainActivity extends PermissionsManager implements MyGPSManager.GPS
         startInternetManager();
         startSensor();
         Constructor.createDatafilesOut();
-        startGoogleGps();
+        //startGoogleGps();
     }
 
     @Override
@@ -96,7 +96,7 @@ public class MainActivity extends PermissionsManager implements MyGPSManager.GPS
         super.onDestroy();
         selectRoadSpinner.clear();
         AppDatabase.destroyInstance();
-        stopGoogleGps();
+        //stopGoogleGps();
         stopSensor();
         stopInternetManager();
         System.gc();
@@ -105,12 +105,24 @@ public class MainActivity extends PermissionsManager implements MyGPSManager.GPS
 
     @Override
     public void getGoogleLocationUpdate(Location location) {
+        /*gpsRecord = new GpsRecord();
+        gpsRecord.setLatitude(location.getLatitude());
+        gpsRecord.setLongitude(location.getLongitude());
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+            gpsRecord.setDateTime(LocalDateTime.now().toString());
+        else
+            gpsRecord.setDateTime(getDatetime());
 
+        gpsRecord.setRoad(selectRoadSpinner.getSelectedItem().id);
+        DatabaseInitializer.insertGpsRecord(AppDatabase.getAppDatabase(this), gpsRecord);*/
+
+        longitude.setText(String.valueOf(round((float) location.getLongitude(), 4)));
+        latitude.setText(String.valueOf(round((float) location.getLatitude(), 4)));
     }
 
     @Override
     public void getLocationUpdate(Location location) {
-        gpsRecord = new GpsRecord();
+        /*gpsRecord = new GpsRecord();
         gpsRecord.setLatitude(location.getLatitude());
         gpsRecord.setLongitude(location.getLongitude());
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
@@ -122,7 +134,7 @@ public class MainActivity extends PermissionsManager implements MyGPSManager.GPS
         DatabaseInitializer.insertGpsRecord(AppDatabase.getAppDatabase(this), gpsRecord);
 
         longitude.setText(String.valueOf(round((float) location.getLongitude(), 4)));
-        latitude.setText(String.valueOf(round((float) location.getLatitude(), 4)));
+        latitude.setText(String.valueOf(round((float) location.getLatitude(), 4)));*/
     }
 
     @Override
@@ -182,14 +194,16 @@ public class MainActivity extends PermissionsManager implements MyGPSManager.GPS
                 if (selectRoadSpinner.getSelectedItem().id != -1)
                     if (meters_seconds_switch.isChecked()) {
                         if (!selectMeters.getText().toString().equals("")) {
-                            startGps(0, Integer.valueOf(selectMeters.getText().toString()));
+                            startGoogleGps();
+                            //startGps(0, Integer.valueOf(selectMeters.getText().toString()));
                         } else {
                             displayToastMessage("Παρακαλώ συμπληρώστε πρώτα τα μέτρα");
                             on_off_switch.setChecked(false);
                         }
                     } else {
                         if (!selectSeconds.getText().toString().equals("")) {
-                            startGps(Integer.valueOf(selectSeconds.getText().toString()) * 1000, 0);
+                            //startGps(Integer.valueOf(selectSeconds.getText().toString()) * 1000, 0);
+                            startGoogleGps();
                         } else {
                             displayToastMessage("Παρακαλώ συμπληρώστε πρώτα τα δευτερόλεπτα");
                             on_off_switch.setChecked(false);
@@ -200,7 +214,8 @@ public class MainActivity extends PermissionsManager implements MyGPSManager.GPS
                     on_off_switch.setChecked(false);
                 }
             } else {
-                stopGps();
+                //stopGps();
+                stopGoogleGps();
                 longitude.setText("0.0");
                 latitude.setText("0.0");
                 speed.setText("0.0");
@@ -265,8 +280,8 @@ public class MainActivity extends PermissionsManager implements MyGPSManager.GPS
         googleLocation = new GoogleLocation
                 .Builder(this, this)
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-                .setFastestInterval(1000)
-                .setUpdateInterval(10000)
+                .setFastestInterval(1)
+                .setUpdateInterval(1)
                 .build();
     }
 
