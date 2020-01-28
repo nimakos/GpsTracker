@@ -104,7 +104,7 @@ public class MainActivity extends PermissionsManager implements MyGPSManager.GPS
 
 
     @Override
-    public void getGoogleLocationUpdate(Location location) {
+    public synchronized void getGoogleLocationUpdate(Location location) {
         /*gpsRecord = new GpsRecord();
         gpsRecord.setLatitude(location.getLatitude());
         gpsRecord.setLongitude(location.getLongitude());
