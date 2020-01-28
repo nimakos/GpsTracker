@@ -265,7 +265,7 @@ public class MainActivity extends PermissionsManager implements MyGPSManager.GPS
         googleLocation = new GoogleLocation
                 .Builder(this, this)
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-                .setFastestInterval(17000)
+                .setFastestInterval(1000)
                 .setUpdateInterval(11000)
                 .build();
     }
