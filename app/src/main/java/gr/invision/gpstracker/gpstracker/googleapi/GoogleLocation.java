@@ -160,11 +160,8 @@ public class GoogleLocation extends LocationCallback implements OnSuccessListene
 
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder();
         builder.addLocationRequest(locationRequest);
+        builder.setAlwaysShow(true); //it ask you if you agree with google the first time only
         LocationSettingsRequest locationSettingsRequest = builder.build();
-
-        //**************************
-        builder.setAlwaysShow(true); //it ask you if you agree with google the first time
-        //**************************
 
         SettingsClient settingsClient = LocationServices.getSettingsClient(context);
         settingsClient.checkLocationSettings(locationSettingsRequest);
