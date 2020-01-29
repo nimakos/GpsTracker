@@ -6,7 +6,6 @@ import android.os.Looper;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
-import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
@@ -26,7 +25,7 @@ import java.lang.ref.WeakReference;
  * .setUpdateInterval(11000)
  * .build();
  */
-public class GoogleLocation extends LocationCallback implements OnSuccessListener<Location>, LocationListener {
+public class GoogleLocation extends LocationCallback implements OnSuccessListener<Location> {
 
     /**
      * Callback interface to receive GPS updates from MyGPSManager.
@@ -134,12 +133,10 @@ public class GoogleLocation extends LocationCallback implements OnSuccessListene
 
     @Override
     public void onSuccess(Location location) {
-        onLocationChanged(location);
     }
 
     @Override
     public void onLocationResult(LocationResult locationResult) {
-        //onLocationChanged(locationResult.getLastLocation());
         for (Location location : locationResult.getLocations()) {
             if (location != null) {
                 onLocationUpdateListener.getGoogleLocationUpdate(location);
@@ -148,14 +145,6 @@ public class GoogleLocation extends LocationCallback implements OnSuccessListene
                 onLocationUpdateListener.getSpeedUpdate(0.0f);
             }
         }
-    }
-
-    @Override
-    public void onLocationChanged(Location location) {
-        System.out.println(location);
-       /* if (location != null)
-            if (onLocationUpdateListener != null)
-                onLocationUpdateListener.getGoogleLocationUpdate(location);*/
     }
 
     /**
