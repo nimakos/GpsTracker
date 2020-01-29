@@ -140,7 +140,9 @@ public class GoogleLocation extends LocationCallback implements OnSuccessListene
         for (Location location : locationResult.getLocations()) {
             if (location != null) {
                 onLocationUpdateListener.getGoogleLocationUpdate(location);
-                onLocationUpdateListener.getSpeedUpdate(location.getSpeed() * MPS_to_KPH);
+                if (location.hasSpeed())
+                    onLocationUpdateListener.getSpeedUpdate(location.getSpeed() * MPS_to_KPH);
+                else onLocationUpdateListener.getSpeedUpdate(0.0f);
             } else {
                 onLocationUpdateListener.getSpeedUpdate(0.0f);
             }
