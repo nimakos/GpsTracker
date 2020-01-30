@@ -32,7 +32,9 @@ public class GoogleLocation extends LocationCallback implements OnSuccessListene
      */
     public interface OnLocationUpdateListener {
         void getGoogleLocationUpdate(Location location);
+    }
 
+    public interface OnSpeedUpdateListener {
         void getSpeedUpdate(float speed);
     }
 
@@ -43,6 +45,7 @@ public class GoogleLocation extends LocationCallback implements OnSuccessListene
     private long UPDATE_INTERVAL;
     private long FASTEST_INTERVAL;
     private int PRIORITY;
+    private OnSpeedUpdateListener onSpeedUpdateListener;
 
     private FusedLocationProviderClient fusedLocationProviderClient;
     private static final float MPS_to_KPH = 3.6f;
@@ -56,8 +59,9 @@ public class GoogleLocation extends LocationCallback implements OnSuccessListene
 
         //optional parameters
         private int priority = LocationRequest.PRIORITY_HIGH_ACCURACY;
-        private long update_interval = 1000 * 2 ;
+        private long update_interval = 1000 * 2;
         private long fastest_interval = 1000;
+        private OnSpeedUpdateListener onSpeedUpdateListener = null;
 
         /**
          * The Builder constructor
@@ -88,6 +92,12 @@ public class GoogleLocation extends LocationCallback implements OnSuccessListene
             return this;
         }
 
+        public Builder setSpeedListener(OnSpeedUpdateListener speedListener) {
+            this.onSpeedUpdateListener = speedListener;
+
+            return this;
+        }
+
         public GoogleLocation build() {
             return getInstance(this);
         }
@@ -104,6 +114,7 @@ public class GoogleLocation extends LocationCallback implements OnSuccessListene
         this.UPDATE_INTERVAL = builder.update_interval;
         this.FASTEST_INTERVAL = builder.fastest_interval;
         this.PRIORITY = builder.priority;
+        this.onSpeedUpdateListener = builder.onSpeedUpdateListener;
         init(contextWeakReference.get());
     }
 
@@ -140,11 +151,14 @@ public class GoogleLocation extends LocationCallback implements OnSuccessListene
         for (Location location : locationResult.getLocations()) {
             if (location != null) {
                 onLocationUpdateListener.getGoogleLocationUpdate(location);
-                if (location.hasSpeed())
-                    onLocationUpdateListener.getSpeedUpdate(location.getSpeed() * MPS_to_KPH);
-                else onLocationUpdateListener.getSpeedUpdate(0.0f);
+                if (onSpeedUpdateListener != null) {
+                    if (location.hasSpeed())
+                        onSpeedUpdateListener.getSpeedUpdate(location.getSpeed() * MPS_to_KPH);
+                    else onSpeedUpdateListener.getSpeedUpdate(0.0f);
+                }
             } else {
-                onLocationUpdateListener.getSpeedUpdate(0.0f);
+                if (onSpeedUpdateListener != null)
+                    onSpeedUpdateListener.getSpeedUpdate(0.0f);
             }
         }
     }

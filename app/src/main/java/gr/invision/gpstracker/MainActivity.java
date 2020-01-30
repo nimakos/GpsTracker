@@ -21,7 +21,6 @@ import com.google.android.material.snackbar.Snackbar;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -41,7 +40,12 @@ import gr.invision.gpstracker.sensortracker.MySensorManager;
 import gr.invision.gpstracker.spinner.DataEntry;
 import gr.invision.gpstracker.spinner.Spinner;
 
-public class MainActivity extends PermissionsManager implements MyGPSManager.GPSListener, MySensorManager.SensorListener, MyConnectionManager.InternetListener, CompoundButton.OnCheckedChangeListener, GoogleLocation.OnLocationUpdateListener {
+public class MainActivity extends PermissionsManager implements
+        MyGPSManager.GPSListener,
+        MySensorManager.SensorListener,
+        MyConnectionManager.InternetListener,
+        CompoundButton.OnCheckedChangeListener,
+        GoogleLocation.OnLocationUpdateListener, GoogleLocation.OnSpeedUpdateListener {
 
     Spinner selectRoadSpinner;
     private static final int REQUEST_PERMISSION = 10;
@@ -282,7 +286,10 @@ public class MainActivity extends PermissionsManager implements MyGPSManager.GPS
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
                 .setFastestInterval(1)
                 .setUpdateInterval(1)
+                //.setSpeedListener(this)
                 .build();
+        googleLocation = new GoogleLocation.Builder(this, this).setSpeedListener(this).build();
+
     }
 
     private void stopGoogleGps() {
