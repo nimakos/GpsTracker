@@ -289,7 +289,6 @@ public class MainActivity extends PermissionsManager implements
                 //.setSpeedListener(this)
                 .build();
         googleLocation = new GoogleLocation.Builder(this, this).setSpeedListener(this).build();
-
     }
 
     private void stopGoogleGps() {
