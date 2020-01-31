@@ -124,9 +124,11 @@ public class GoogleLocation extends LocationCallback implements OnSuccessListene
      * @param builder The Builder class
      * @return This single instance
      */
-    private synchronized static GoogleLocation getInstance(Builder builder) {
+    private static GoogleLocation getInstance(Builder builder) {
         if (INSTANCE == null) {
-            INSTANCE = new GoogleLocation(builder);
+            synchronized (GoogleLocation.class) {
+                INSTANCE = new GoogleLocation(builder);
+            }
         }
         return INSTANCE;
     }
