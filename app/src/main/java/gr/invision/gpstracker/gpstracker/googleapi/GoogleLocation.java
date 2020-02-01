@@ -177,6 +177,7 @@ public class GoogleLocation extends LocationCallback implements OnSuccessListene
         fusedLocationProviderClient = null;
         onSpeedUpdateListener = null;
         onLocationUpdateListener = null;
+        onSuccessListener = null;
         INSTANCE = null;
     }
 
