@@ -19,13 +19,17 @@ import java.lang.ref.WeakReference;
  * Checking device's GPS settings and select the best provider
  * Call from activity like:
  * googleLocation = new GoogleLocation
- * .Builder(this, this)
- * .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
- * .setFastestInterval(17000)
- * .setUpdateInterval(11000)
- * .build();
+ *  .Builder(this, this)
+ *  .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+ *  .setFastestInterval(17000)
+ *  .setUpdateInterval(11000)
+ *  .setSpeedListener(this)
+ *  .setSuccessListener(this)
+ *  .hasSingleInstance(true)
+ *  .build();
  */
 public class GoogleLocation extends LocationCallback implements OnSuccessListener<Location> {
+
 
     /**
      * Callback interface to receive GPS updates from MyGPSManager.
@@ -38,6 +42,10 @@ public class GoogleLocation extends LocationCallback implements OnSuccessListene
         void getSpeedUpdate(float speed);
     }
 
+    public interface OnSuccessListener {
+        void onSuccess(Location location);
+    }
+
     //required parameters
     private OnLocationUpdateListener onLocationUpdateListener;
 
@@ -46,7 +54,9 @@ public class GoogleLocation extends LocationCallback implements OnSuccessListene
     private long FASTEST_INTERVAL;
     private int PRIORITY;
     private OnSpeedUpdateListener onSpeedUpdateListener;
+    private OnSuccessListener onSuccessListener;
 
+    //class parameters
     private FusedLocationProviderClient fusedLocationProviderClient;
     private static final float MPS_to_KPH = 3.6f;
     private static GoogleLocation INSTANCE;
@@ -62,6 +72,8 @@ public class GoogleLocation extends LocationCallback implements OnSuccessListene
         private long update_interval = 1000 * 2;
         private long fastest_interval = 1000;
         private OnSpeedUpdateListener onSpeedUpdateListener = null;
+        private boolean createSingleInstance;
+        private OnSuccessListener onSuccessListener;
 
         /**
          * The Builder constructor
@@ -98,6 +110,18 @@ public class GoogleLocation extends LocationCallback implements OnSuccessListene
             return this;
         }
 
+        public Builder hasSingleInstance(boolean createSingleInstance) {
+            this.createSingleInstance = createSingleInstance;
+
+            return this;
+        }
+
+        public Builder setSuccessListener(OnSuccessListener successListener) {
+            this.onSuccessListener = successListener;
+
+            return this;
+        }
+
         public GoogleLocation build() {
             return getInstance(this);
         }
@@ -115,18 +139,31 @@ public class GoogleLocation extends LocationCallback implements OnSuccessListene
         this.FASTEST_INTERVAL = builder.fastest_interval;
         this.PRIORITY = builder.priority;
         this.onSpeedUpdateListener = builder.onSpeedUpdateListener;
+        this.onSuccessListener = builder.onSuccessListener;
         init(contextWeakReference.get());
     }
 
     /**
-     * Singleton pattern. This constructor creates only one instance
+     * Singleton pattern under circumstances.
+     * This constructor creates only one instance, if we chose to
      *
      * @param builder The Builder class
      * @return This single instance
      */
     private synchronized static GoogleLocation getInstance(Builder builder) {
-        if (INSTANCE == null) {
-            INSTANCE = new GoogleLocation(builder);
+        if (builder.createSingleInstance) {
+            if (INSTANCE == null) {
+                synchronized (GoogleLocation.class) {
+                    INSTANCE = new GoogleLocation(builder);
+                }
+            }
+            else {
+                return INSTANCE;
+            }
+        } else {
+            synchronized (GoogleLocation.class) {
+                INSTANCE = new GoogleLocation(builder);
+            }
         }
         return INSTANCE;
     }
@@ -138,12 +175,16 @@ public class GoogleLocation extends LocationCallback implements OnSuccessListene
         if (fusedLocationProviderClient != null)
             fusedLocationProviderClient.removeLocationUpdates(this);
         fusedLocationProviderClient = null;
+        onSpeedUpdateListener = null;
         onLocationUpdateListener = null;
         INSTANCE = null;
     }
 
     @Override
     public void onSuccess(Location location) {
+        if (onSuccessListener != null && location != null) {
+            onSuccessListener.onSuccess(location);
+        }
     }
 
     @Override
