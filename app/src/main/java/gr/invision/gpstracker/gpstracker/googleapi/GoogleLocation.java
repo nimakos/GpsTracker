@@ -4,6 +4,8 @@ import android.content.Context;
 import android.location.Location;
 import android.os.Looper;
 
+import androidx.annotation.NonNull;
+
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -29,7 +31,6 @@ import java.lang.ref.WeakReference;
  *  .build();
  */
 public class GoogleLocation extends LocationCallback implements OnSuccessListener<Location> {
-
 
     /**
      * Callback interface to receive GPS updates from MyGPSManager.
@@ -132,7 +133,7 @@ public class GoogleLocation extends LocationCallback implements OnSuccessListene
      *
      * @param builder The builder class
      */
-    private GoogleLocation(Builder builder) {
+    private GoogleLocation(@NonNull Builder builder) {
         WeakReference<Context> contextWeakReference = new WeakReference<>(builder.context);
         this.onLocationUpdateListener = builder.onLocationUpdateListener;
         this.UPDATE_INTERVAL = builder.update_interval;
@@ -150,7 +151,7 @@ public class GoogleLocation extends LocationCallback implements OnSuccessListene
      * @param builder The Builder class
      * @return This single instance
      */
-    private synchronized static GoogleLocation getInstance(Builder builder) {
+    private synchronized static GoogleLocation getInstance(@NonNull Builder builder) {
         if (builder.createSingleInstance) {
             if (INSTANCE == null) {
                 synchronized (GoogleLocation.class) {
@@ -189,7 +190,7 @@ public class GoogleLocation extends LocationCallback implements OnSuccessListene
     }
 
     @Override
-    public void onLocationResult(LocationResult locationResult) {
+    public void onLocationResult(@NonNull LocationResult locationResult) {
         for (Location location : locationResult.getLocations()) {
             if (location != null) {
                 onLocationUpdateListener.getGoogleLocationUpdate(location);
